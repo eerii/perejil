@@ -1,0 +1,334 @@
+\documentclass[12pt, a4paper, titlepage]{article}
+
+%INFORMACIÓN
+\title{\textbf {TITULO}}
+\author{{\Large NOMBRE}\\DNI}
+\date{}
+
+%PAQUETES
+%---
+%Idioma
+\usepackage[spanish,es-tabla,galician]{babel} %Convencións idiomáticas
+\selectlanguage{galician} %Elexir un idioma no caso de varios
+%---
+%Cores
+\usepackage[dvipsnames]{xcolor} %Colorear texto e cores básicas
+\usepackage{colortbl} %Colorear celdas de tablas
+%Definir cores personalizadas
+\definecolor{Azul}{RGB}{110, 176, 230}
+\definecolor{Vermello}{RGB}{222, 94, 80}
+\definecolor{Link}{RGB}{20, 88, 224}
+%---
+%Estrutura
+\usepackage[margin=2.5cm]{geometry} %Márxenes
+\usepackage[skip=12pt]{parskip} %Espacio tras os parágrafos
+\linespread{1.3} %Interlineado
+\usepackage{float} %Controlar o posicionamento dos obxetos con [H]
+\usepackage[toc,page]{appendix} %Apéndices
+\renewcommand{\appendixpagename}{Apéndices} %Cambiar o nome
+\renewcommand{\appendixtocname}{\large Apéndices}
+\renewcommand{\appendixname}{Apéndices}
+\usepackage{chngcntr} %Resetear o contador de Secciones cada Parte
+\counterwithin*{section}{part}
+%---
+%Funcións
+\usepackage[centertags]{amsmath} %Funcións matemáticas esenciais
+\usepackage{hyperref} %Crear hipervínculos
+\hypersetup{
+    colorlinks=true,
+    linkcolor=Link,
+    filecolor=Vermello,
+    urlcolor=Azul,
+}
+\usepackage[siunitx]{circuitikz} %Debuxar circuitos por código, fai que a compilación sexa máis lenta
+%---
+%Sintaxis
+%MINTED ESTÁ DESACTIVADO POR REQUERIR CONFIGURACIÓN EXTRA, LER ABAIXO
+%\usepackage{minted} %Sintáxis para código de Python
+%IMPORTANTE: Necesitas una versión actual de Python y el paquete Pygments.
+%Instálalo utilizando pip, ya sea con pip3 install pygments, python3 -m pip install pygments, python -m pip install pygments o la versión correspondiente a tu sistema
+%Tamén tes que cambiar a configuración de latexmk para utilizar a opción "-shell-escape".
+%Ver toda a información en http://tug.ctan.org/macros/latex/contrib/minted/minted.pdf
+%---
+%Soporte de arquivos
+\usepackage{graphicx} %Imáxes
+\usepackage{csvsimple} %Tablas .csv
+\usepackage{pgfplots} %Gráficas vectoriais dende matplotlib .pgf
+\pgfplotsset{compat=1.16}
+%---
+%Correccións extra
+%Conflicto entre pgfplots e mathbb
+\protected\edef\mathbb{%
+  \unexpanded\expandafter\expandafter\expandafter{%
+    \csname mathbb \endcsname
+  }%
+}
+%Quitar o título "Referencias" da bibliografía
+\usepackage{etoolbox}
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
+%---
+
+\begin{document}
+  \maketitle
+
+  %ÍNDICE
+  \tableofcontents
+
+  %INTRODUCCIÓN
+
+  \newpage
+  \part*{Introducción} %Parte sen numeración, pero engadida a tabla de contidos
+  \addcontentsline{toc}{part}{Introducción}
+
+  \textcolor{Vermello}{\textbf{IMPORTANTE:}} Esta é unha plantilla de exemplo do que se pode facer en \LaTeX. Ao importar moitos paquetes e facer moitas gráficas o tempo de compilación do arquivo é bastante largo (de varios segundos\footnotemark). Por iso, ao facer un documento novo, é recomendable comentar con \% todos os paquetes que non se utilicen e eliminar todo o contido do corpo, para logo ir pegando só o necesario.
+
+  \footnotetext{Parece que non é nada, pero se cada vez que gardas para ver como queda o documento tes que esperar uns segundos acabarás querendo tirar o ordeador pola ventá :)))}
+  %Exemplo de nota ao pe, utilizando \footnotemark para indicar onde va, e logo \footnotetext{o texto} para escribila
+  %Tamén se pode facer simplemente como \footnote{o texto} e a introducirá nese espacio.
+
+  A estrutura de partes e introducción tamén é completamente persoalizable, cada quén é libre de distribuír e nomear o documento como prefira.
+
+  Dito isto, espero que che sea leve e que disfrutes facendo as memorias :D Un abrazo jo.
+
+
+  %CORPO
+
+  \newpage
+  \part{Xerarquía}
+
+  \section{Sección}
+
+  \subsection{Subsección}
+
+  \subsubsection{Subsubsección}
+
+  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+
+  \newpage
+  \part{Funcións}
+
+  \section{Matemáticas}
+
+  \subsection{Ecuacións}
+
+  Ecuación numerada:
+  \begin{equation} \label{ec:test}
+    z = r e^{i \theta}
+  \end{equation}
+
+  %Superíndices con ^ e subíndices con _, so funciona en modo matemático (dentro de equation, align, center ou dentro de $ $)
+  %Se o sub/superíndice ten máis dun caracter, tes que poñelo entre corchetes, por exemplo, e^x está ben, pero tes que escribir e^{2x}
+
+  Ecuación sen numerar:
+  \begin{equation*}
+    f(z) = \frac{z \cdot \log{z}}{(z + i)(z - i)}
+  \end{equation*}
+
+  Varias ecuacións centradas:
+  \begin{gather}
+    f(z) = z^2 + 1 = (x + iy)^2 + 1 \nonumber \\ %nonumer - sen número
+    f(z) = x^2 - y^2 + 2ixy + 1 \label{ec:test2}
+  \end{gather}
+
+  Varias ecuacións alineadas:
+  \begin{align} %Alinéanse en &
+    f(x) &= 2x + \int^a_b y^2 dy \label{ec:test3} \\
+    f(x) &= 2 (x\lambda + \frac{1}{2}y) \label{ec:test4}
+  \end{align}
+
+  Tamén se pode poñer unha ecuación dentro do texto como $\nabla \times \vec{E} = -\frac{\partial{\vec{b}}}{\partial{t}}$\cite{griffiths_2018}.
+  %Podes citar con \cite[nome]
+
+  Para referenciar unha ecuación, utilízase \ref{ec:test2}.
+
+  \subsection{Matrices}
+
+  As matrices introdúcense coma unha ecuación, teñen que estar ou ben dentro de \$ \$ ou nun entorno equation, gather ou align.
+
+  \begin{equation*}
+  \left( %Esto é un paréntese grande
+    \begin{matrix}
+      x\\
+      y\\
+      z
+    \end{matrix}
+  \right)
+  \cdot
+  \left(
+    \begin{matrix}
+      0 & 1 & 1\\
+      1 & 0 & 1\\
+      1 & 1 & 0
+    \end{matrix}
+  \right)
+  =
+  \left(
+    \begin{matrix}
+      y+z\\
+      x+z\\
+      x+y
+    \end{matrix}
+  \right)
+  \end{equation*}
+
+
+  \section{Gráficas}
+
+  \begin{figure}[H] %A [H] indica que o posicione "aquí"
+    %\centering
+    \hspace{12pt}
+    \input{Test.pgf}
+    \caption{Gráfica dende .pgf}
+  \end{figure}
+  %Como as gráficas son asimétricas, en vez de utilizar centering é unha preferencia persoal utilizar un espaciado variable e "centrala a ollo". Isto non é obligatorio.
+  %Podes utilizar unha imáxe jpg ou png (habilitar o paquete graphicx) ou unha gráfica vectorial xerada por matplotlib directamente en pgf (habilitar pgfplots)
+
+  \section{Tablas}
+
+  \subsection{Dende .csv}
+
+  \begin{table}[H]
+    \centering
+    \csvreader[
+      tabular=|c|c|c|c|, %Engadir o número de columnas e "c" para centrar, "|" para lineas verticais
+      table head=\hline %Liña horizontal que comeza a tabla
+                  Medida & %Os titulos das seccións separados por & (Poden estar na mesma linea, pero por claridade os separei en varias)
+                  $z$ (m) & %Poden utilizarse fórmulas matemáticas ou calquer formato de LaTeX
+                  $B_{exp}$ (T) &
+                  $B_{teo}$ (T) \\
+                  \hline, %Liña horizontal despois da primeira fila
+      late after last line=\\\hline, %Liña horizontal do final
+      separator=semicolon %[!] Cambiar en caso de ter un csv con formato distinto
+      ]{Test.csv} %Arquivo csv
+      {z=\colz, Bexp=\colbexp, Bteo=\colbteo} %Lista de nomes exactamente como saen no csv = crea un nome de variable en LaTeX (o que ti queiras)
+                                              %Por exemplo, da columna "z" do csv, podemos facer z = \colz
+                                              %[!] Evitar utilizar nomes de variables de unha soa letra ou xa existentes, pois podemos estropear algunhas funcións de LaTeX
+      {\thecsvrow & \colz & \colbexp & \colbteo} %Polo orde no que queremos mostrar as columnas na tabla, poñer as variables do paso anterior
+                                                 %\thecsvrow indica a columna na que nos atopamos, é util para unha lista de medidas
+      \caption{Tabla dende .csv}
+  \end{table}
+
+  \subsection{Dende tablesgenerator}
+  %Ir a https://www.tablesgenerator.com e pegar o resultado
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    \rowcolor[HTML]{FBBCBA}
+    1  & 2  & 3  & 4  & 5  \\ \hline
+    \rowcolor[HTML]{FFEDB7}
+    6  & 7  & 8  & 9  & 10 \\ \hline
+    \rowcolor[HTML]{D0F2A7}
+    11 & 12 & 13 & 14 & 15 \\ \hline
+    \rowcolor[HTML]{D0E2F9}
+    16 & 17 & 18 & 19 & 20 \\ \hline
+    \end{tabular}
+    \caption{Tabla de LaTeX}
+  \end{table}
+
+
+  \section{Código Python}
+
+  %IMPORTANTE, LER ARRIBA COMO ACTIVAR A SINTAXE DE PYTHON, REQUIRE CONFIGURACIÓN
+
+  %\usemintedstyle{pastie} %Podes cambiar as cores e o estilo
+
+  % \begin{minted}{python}
+  %   def reg_lin(x, y):
+  %     n = len(x)
+
+  %     sx = x.sum(); sy = y.sum()
+  %     sxy = (x*y).sum(); sx2 = (x**2).sum(); sy2 = (y**2).sum()
+
+  %     a = (sy*sx2 - sx*sxy) / (n*sx2 - sx**2)
+  %     b = (n*sxy - sx*sy) / (n*sx2 - sx**2)
+
+  %     sdesv = ((y - a - b*x)**2).sum()
+  %     s = (sdesv/float(n-2))*0.5
+  %     sa = s*(sx2 / (n*sx2 - sx**2))**0.5
+  %     sb = s*(n / (n*sx2 - sx**2))**0.5
+
+  %     r = (n*sxy - sx*sy)/(((n*sx2 - sx**2)*(n*sy2 - sy**2))**0.5)
+
+  %     print("a=", a, "b=", b)
+  %     print("s=", s, "sa=", sa, "sb=", sb)
+  %     print("r=", r, "\n---")
+  % \end{minted}
+
+  %Tamén se pode poñer en medio do texto como \mintinline{python}{import numpy as np}.
+  %Ou cargar directamente dun archivo con \inputminted[opcions]{python}{nome.py}.
+
+
+  \section{Circuitos}
+  %Ver documentación en https://ctan.javinator9889.com/graphics/pgf/contrib/circuitikz/doc/circuitikzmanual.pdf
+
+  \begin{figure}[H]
+    \centering
+    \begin{circuitikz}[european]
+      \draw (0,0) to[voltage source, l=V] (0,3)
+      to[R, l=R] (3,3)
+      to[capacitor, l=C] (3,0) -- (0,0);
+    \end{circuitikz}
+    \caption{Circuito simple}
+  \end{figure}
+
+  \begin{figure}[H]
+    \centering
+    \begin{circuitikz}[european]
+      \draw (0,0) node[cute spdt up](S){}
+      (S.out 1) -- ++(2,0) to[capacitor, l=C] ++(0,-3) -- ++(0,-1) -- ++(-1, 0)
+      to[ammeter, l=A] ++(-2, 0)
+      to[R, l=R] ++(0,1.79)
+      to[voltage source, l=V] ++(0,1.79) -- (S.in)
+      (S.out 2) -- ++(1,0) to[R, l=$100\Omega$] ++(0,-3.18);
+    \end{circuitikz}
+    \caption{Circuito máis complexo}
+  \end{figure}
+
+  
+  \section{Imáxes}
+
+  \begin{figure}[H]
+    \centering
+    \resizebox{9cm}{!}{ %Dimensións (especificas unha e a outra ponse soa coa exclamación)
+      \includegraphics{Test.jpg}
+    }
+    \caption[Estudante de física cando abre \LaTeX]{Estudante de física cando abre \LaTeX por primeira vez\protect\footnotemark}
+  \end{figure}
+
+  \footnotetext{Bueno, ou por segunda, terceira, vigéximo-primeira ou $n$-vez sendo $n \in \mathbb{Z^+}$ e $n \to \infty$}
+
+  %Por qué aquí a caption é distinta? Como estamos engadindo unha nota a pé de páxina, o compilador de LaTeX necesita un texto normal para poñer na lista de figuras, e non permite notas a pe de páxina.
+  %Así estamos "saltandonos" esa restricción poñendo dúas descripcións, unha en corchetes para a lista de figuras, e outra entre curly braces para o que se amosa en pantalla.
+  %Isto só e necesario se engadimos unha nota a pe de páxina nunha caption, algo que é moi moi raro pero quería facer.
+
+  %APÉNDICES
+
+  \newpage
+  \begin{appendices}
+    %Formato para a tabla de contido, ignorar
+    \addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+    \makeatletter
+    \addtocontents{toc}{%
+    \begingroup
+    \let\protect\l@chapter\protect\l@section
+    \let\protect\l@section\protect\l@subsection
+    }
+
+    %Cada sección é un apéndice
+    \section{Proba}
+
+    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+    \section{Bibliografía}
+
+    %Cita libros con \cite[nombre]
+
+    \bibliography{Bibliografia} %Poñer a bibliografía aquí
+    \bibliographystyle{ieeetr} %Cambiar ao estilo apropiado
+
+    \addtocontents{toc}{\endgroup}
+  \end{appendices}
+
+\end{document}
