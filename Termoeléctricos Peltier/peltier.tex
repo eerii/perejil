@@ -1,0 +1,832 @@
+\documentclass[12pt, a4paper, titlepage]{article}
+
+%INFORMACIÓN
+\title{\textbf{Fenómenos Termoeléctricos\\\Huge{Efecto Peltier}}\\\textbf{\large \textit{Laboratorio de termodinámica (TP)}}}
+\author{{\Large José Pazos Pérez}\\Grupo T2a}
+\date{}
+
+%PAQUETES
+%---
+%Idioma
+\usepackage[spanish,es-tabla,galician]{babel} %Convencións idiomáticas
+\selectlanguage{galician} %Elexir un idioma no ca so de varios
+%---
+%Cores
+\usepackage[dvipsnames]{xcolor} %Colorear texto e cores básicas
+\usepackage{colortbl} %Colorear celdas de tablas
+%Definir cores personalizadas
+\definecolor{Azul}{RGB}{110, 176, 230}
+\definecolor{Vermello}{RGB}{222, 94, 80}
+\definecolor{Link}{RGB}{20, 88, 224}
+%---
+%Estrutura
+\usepackage[margin=2.5cm]{geometry} %Márxenes
+\usepackage[skip=12pt]{parskip} %Espacio tras os parágrafos
+\linespread{1.3} %Interlineado
+\usepackage{float} %Controlar o posicionamento dos obxetos con [H]
+\usepackage[toc,page]{appendix} %Apéndices
+\renewcommand{\appendixpagename}{Apéndices} %Cambiar o nome
+\renewcommand{\appendixtocname}{\large Apéndices}
+\renewcommand{\appendixname}{Apéndices}
+\usepackage{chngcntr} %Resetear o contador de Secciones cada Parte
+\counterwithin*{section}{part}
+%---
+%Funcións
+\usepackage[centertags]{amsmath} %Funcións matemáticas esenciais
+\usepackage{hyperref} %Crear hipervínculos
+\hypersetup{
+    colorlinks=true,
+    linkcolor=Link,
+    filecolor=Vermello,
+    urlcolor=Azul,
+}
+%\usepackage[siunitx]{circuitikz} %Debuxar circuitos por código, fai que a compilación sexa máis lenta
+%---
+%Sintaxis
+%\usepackage{minted} %Sintáxis para código de Python
+%IMPORTANTE: Necesitas una versión actual de Python y el paquete Pygments.
+%Instálalo utilizando pip, ya sea con pip3 install pygments, python3 -m pip install pygments, python -m pip install pygments o la versión correspondiente a tu sistema
+%Tamén tes que cambiar a configuración de latexmk para utilizar a opción "-shell-escape".
+%Ver toda a información en http://tug.ctan.org/macros/latex/contrib/minted/minted.pdf
+%---
+%Soporte de arquivos
+\usepackage{graphicx} %Imáxes
+%\usepackage{csvsimple} %Tablas .csv
+\usepackage{pgfplots} %Gráficas vectoriais dende matplotlib .pgf
+%\pgfplotsset{compat=1.16}
+%---
+%Correccións extra
+%Conflicto entre pgfplots e mathbb
+\protected\edef\mathbb{%
+  \unexpanded\expandafter\expandafter\expandafter{%
+    \csname mathbb \endcsname
+  }%
+}
+%Quitar o título "Referencias" da bibliografía
+\usepackage{etoolbox}
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
+%---
+
+\begin{document}
+  \maketitle
+
+  \tableofcontents
+
+  \newpage
+  \part{Introducción}
+
+  \section{Obxetivos}
+
+  Nesta práctica continuaremos a experimentación co dispositivo termoeléctrico utilizado para comprobar o efecto Seebeck. O obxetivo principal da práctica é \textbf{obter o coeficiente de Peltier} $\mathbf{\pi_{AB}}$ do dispositivo termoeléctrico.
+
+  Tamén buscaremos a intuición co efecto Peltier. Así mesmo, volveremos a facer regresións a unha función exponencial como na práctica anterior, e comprobar as outras constantes coñecidas do dispositivo.
+
+  \section{Material}
+
+  \begin{itemize}
+    \item \textbf{Dispositivo termoeléctrico} con 142 pares de conductores A e B
+    \item \textbf{Unión fría:} conectada ó grifo
+    \item \textbf{Unión quente:} contectada á resistencia calefactora
+    \item Fonte de corrente alterna
+    \item Fonte de corrente continua
+    \item Multímetro en configuración voltímetro AC
+    \item Multímetro en configuración amperímetro DC
+    \item Termómetro dixital conectado ás unións fría e quente
+  \end{itemize}
+
+
+  \section{O problema de estudo}
+
+  Mentres que o efecto Seebeck crea un potencial eléctrico entre os bornes dun dispositivo termoeléctrico a distintas temperaturas, o efecto Peltier describe como, ó someter as unións do dispositivo a unha diferencia de potencial, os bornes varían a súa temperatura.
+
+  \subsection{¿Cómo funciona?}
+
+  Temos dous materiais conductores, \textbf{A} e \textbf{B}, con diferentes densidades electrónicas. Os conectamos en dúas partes, chamadas \textit{unións}, inicialmente á mesma temperatura.
+  Se facemos circular unha corrente aparecerá un fluxo de calor entre ambas, e unha enfriarase (\textit{unión fría}) e outra quentarase (\textit{unión quente}).
+
+  Ó revertir o sentido da corrente invértese o intercambio de calor, polo que cambian as unións fría e quente. Dicimos pois que o efecto Peltier é reversible.
+
+  \subsection{Ecuación de Peltier}
+
+  Nesta práctica queremos calcular o coeficiente de Peltier, $\pi_{AB}$. Para iso, podemos utilizar a ecuación que relaciona a calor que flúe dun extremo a outro, de Peltier, $\dot{Q}_P$, coa intensidade que aplicamos:
+  \begin{equation}
+    \dot{Q}_P = \pi_{AB} \cdot I
+    \label{ec:peltier}
+  \end{equation}
+
+  Para atopar o coeficiente primeiro necesitamos coñecer $I$ e $\dot{Q}_P$. A intensidade $I$ pode ser medida co amperímetro. Para o fluxo de calor teremos que facer un desarroio máis complexo.
+
+  \subsection{Calor de Peltier}
+
+  Montaremos as unións da mesma maneira que na práctica de Seebeck: o grifo conectado na unión fría e a unión quente coa mesma resistencia calefactora que xa utilizáramos, $R_C$. A ecuación diferencial de balance enerxético da unión quente proporciona unha maneira de despexar a calor:
+  \begin{equation}
+    C \frac{dT_2}{dt} = W_{R_C} - \lambda_T(T_2 - T_1) + \frac{1}{2} I^2 r_i \pm \dot{Q}_p
+    \label{ec:balance_enerxetico}
+  \end{equation}
+
+  $W_{R_C}$ é a potencia proporcionada pola resistencia $R_C$ por efecto Joule. $- \lambda_T(T_2 - T_1)$ é o fluxo de calor entre ambas unións por estar a distintas temperaturas, o efecto Fourier.
+  $\frac{1}{2} I^2 r_i$ é o quecemento do módulo termoeléctico, tamén por efecto Joule, debido á corrente que circula por él. O factor $\frac{1}{2}$ ven da suposición que este incremento na temperatura se distribúe de igual maneira entre ambos extremos.
+  Por último temos $\dot{Q}_P$, a calor de Peltier que, ó ser reversible, pode ter signo $\pm$.
+
+  Cando se acada o estado estacionario, $T_2$ no varía co tempo, e $\frac{dT_2}{dt} = 0$. Isto anula o lado esquerdo da igualdade. Reescribiremos a fórmula anterior considerando que o efecto Peltier enfriará a unión quente (tomando o signo negativo para $\dot{Q_P}$), e que $W_{R_C} = \frac{V^2}{R_C}$:
+  \begin{equation}
+    \dot{Q}_p = \frac{V^2}{R_C} - \lambda_T(T_2^\infty - T_1) + \frac{1}{2} I^2 r_i
+    \label{ec:balance_enerxetico_estacionario}
+  \end{equation}
+
+  Os parámetros $R_C$, $\lambda_T$ e $r_i$ xa os calculamos na práctica anterior. Tomamos a media dos valores obtidos para ambos potenciais e amosamos os valores cos que traballaremos no seguinte cadro:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|}
+      \hline
+      $R_C = 818.5 \pm 1.0 \ \Omega$ \\ \hline
+      $\lambda_T = 0.867 \pm 0.042 \ W/K$ \\ \hline
+      $C = 1318 \pm 66 \ J/K$ \\ \hline
+      $r_i = 4.650101 \pm 5.5 \cdot 10^{-5} \ \Omega$\\ \hline
+    \end{tabular}
+    \caption{Medicións realizadas na práctica de Seebeck}
+    \label{cad:practica_seebeck}
+  \end{table}
+
+  Mediremos $T_1$ cando o dispositivo acade o estado estacionario. Para calcular $T_2^\infty$ podemos utilizar a mesma ecuación de evolución temporal que na práctica anterior, e facer unha regresión non lineal:
+  \begin{equation}
+    T_2(t) = T_2^\infty - (T_2^\infty - T_2(0)) e^{\frac{\lambda_T}{C}t}
+    \label{ec:t2_estacionario}
+  \end{equation}
+
+
+  \newpage
+  \part{Procedemento experimental}
+
+  \section{Sentido da corrente}
+
+  Antes de comezar coa práctica debemos asegurarnos de que o circuito quente, conectado á resistencia calefactora, é o que se enfría.
+  Realizaremos a montaxe completa detallada no guión da práctica: O módulo, a fonte de DC e o amperímetro en serie;  a resistencia calefactora, a fonte de AC e o voltímetro en paralelo.
+
+  Asegurámonos de que o termómetro está acendido e ben conectado, e acendemos a fonte de DC. Veremos que unha das dúas unións sube de temperatura. Se é $T_2$ apagamos a fonte e intercambiamos a súa polaridade.
+
+  \section{Evolución ó estado estacionario}
+
+  \subsection{Procedemento}
+
+  Unha vez configurado o circuito correctamente podemos acender ambas fontes de corrente. Fixamos a fonte de AC a $150V$ (medición co voltímetro de $152,0 \pm 0,5 V$) e non a cambiaremos no transcurso da práctica.
+
+  Agora colocamos a fonte de DC en $0,5A$ e anotamos as temperaturas $T_1$ e $T_2$ cada minuto. Cando o incremento de $T_2$ sexa menor a $0,1 ^\circ C$ cada dous minutos consideraremos acadado o estado estacionario.
+  Entón repetiremos estas medidas aumentando a intensidade en intervalos de $0,5A$. É importante que $T_2$ non baixe de $5 ^\circ C$ xa que se podería conxelar a auga e dañar o dispositivo termoeléctrico.
+
+  \subsection{Medidas}
+
+  Presentamos a continuación as táboas de datos obtidos no laboratorio.
+  O tempo se expresará en minutos e terá unha incertidumbre de $\pm 3s$ pola posible imprecisión pola nosa parte ó anotar o resultado. A temperatura aparece en $^\circ C$ e ten unha incertidumbre de $0,1 ^\circ C$ do termómetro. Para a representación estas unidades son máis intuitivas, pero para facer os cálculos utilizaremos segundos e Kelvin respectivamente.
+
+  \begin{table}[H]
+    \centering
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        1         & 15,0             & 13,7             \\ \hline
+        2         & 14,9             & 13,8             \\ \hline
+        3         & 14,9             & 14,5             \\ \hline
+        4         & 15,0             & 15,5             \\ \hline
+        5         & 15,1             & 16,6             \\ \hline
+        6         & 15,2             & 17,4             \\ \hline
+        7         & 15,3             & 18,2             \\ \hline
+        8         & 15,3             & 19,0             \\ \hline
+        9         & 15,5             & 19,9             \\ \hline
+        10        & 15,6             & 20,7             \\ \hline
+        11        & 15,6             & 21,4             \\ \hline
+        12        & 15,5             & 22,1             \\ \hline
+        13        & 15,6             & 22,9             \\ \hline
+        14        & 15,7             & 23,6             \\ \hline
+        15        & 15,7             & 24,1             \\ \hline
+        16        & 15,7             & 24,9             \\ \hline
+        17        & 15,8             & 25,4             \\ \hline
+        18        & 15,8             & 26,0             \\ \hline
+        19        & 15,9             & 26,5             \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        20        & 16,0             & 27,1             \\ \hline
+        21        & 16,0             & 27,5             \\ \hline
+        22        & 16,0             & 27,9             \\ \hline
+        23        & 15,9             & 28,4             \\ \hline
+        24        & 16,0             & 28,8             \\ \hline
+        25        & 16,1             & 29,2             \\ \hline
+        26        & 16,1             & 29,7             \\ \hline
+        27        & 16,1             & 30,2             \\ \hline
+        28        & 16,1             & 30,4             \\ \hline
+        29        & 16,2             & 30,7             \\ \hline
+        30        & 16,2             & 31,0             \\ \hline
+        31        & 16,2             & 31,4             \\ \hline
+        32        & 16,4             & 31,7             \\ \hline
+        33        & 16,2             & 32,0             \\ \hline
+        34        & 16,2             & 32,3             \\ \hline
+        35        & 16,2             & 32,4             \\ \hline
+        36        & 16,2             & 32,6             \\ \hline
+        37        & 16,4             & 32,8             \\ \hline
+        38        & 16,4             & 33,1             \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        39        & 16,4             & 33,3             \\ \hline
+        40        & 16,4             & 33,6             \\ \hline
+        41        & 16,4             & 33,8             \\ \hline
+        42        & 16,5             & 34,0             \\ \hline
+        43        & 16,5             & 34,1             \\ \hline
+        44        & 16,5             & 34,3             \\ \hline
+        45        & 16,5             & 34,5             \\ \hline
+        46        & 16,5             & 34,7             \\ \hline
+        47        & 16,6             & 34,7             \\ \hline
+        48        & 16,6             & 34,9             \\ \hline
+        49        & 16,5             & 35,0             \\ \hline
+        50        & 16,5             & 35,2             \\ \hline
+        51        & 16,5             & 35,4             \\ \hline
+        52        & 16,6             & 35,5             \\ \hline
+        53        & 16,7             & 35,7             \\ \hline
+        54        & 16,6             & 35,8             \\ \hline
+        55        & 16,7             & 35,9             \\ \hline
+        56        & 16,6             & 36,0             \\ \hline
+        57        & 16,7             & 36,1             \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        58        & 16,7             & 36,3             \\ \hline
+        59        & 16,8             & 36,4             \\ \hline
+        60        & 16,8             & 36,6             \\ \hline
+        61        & 16,8             & 36,8             \\ \hline
+        62        & 16,8             & 36,9             \\ \hline
+        63        & 16,8             & 37,0             \\ \hline
+        64        & 16,8             & 37,0             \\ \hline
+        65        & 16,8             & 37,1             \\ \hline
+        66        & 16,8             & 37,2             \\ \hline
+        67        & 16,8             & 37,2             \\ \hline
+        68        & 16,8             & 37,3             \\ \hline
+        69        & 16,8             & 37,4             \\ \hline
+        70        & 16,8             & 37,4             \\ \hline
+        71        & 16,8             & 37,5             \\ \hline
+        72        & 16,8             & 37,7             \\ \hline
+        73        & 16,8             & 37,8             \\ \hline
+        74        & 16,8             & 37,8             \\ \hline
+        75        & 16,8             & 37,8             \\ \hline
+        & & \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \caption{Datos $T_1$ e $T_2$ respecto ó tempo para $I = 0,5A$}
+    \label{cad:t_i_05}
+  \end{table}
+
+  \begin{table}[H]
+    \centering
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        76  & 37,4 & 17,2 \\ \hline
+        77  & 37,1 & 17,4 \\ \hline
+        78  & 36,9 & 17,4 \\ \hline
+        79  & 36,7 & 17,5 \\ \hline
+        80  & 36,5 & 17,4 \\ \hline
+        81  & 36,4 & 17,4 \\ \hline
+        82  & 36,2 & 17,4 \\ \hline
+        83  & 36,1 & 17,5 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        84  & 36,0 & 17,5 \\ \hline
+        85  & 35,8 & 17,6 \\ \hline
+        86  & 35,7 & 17,5 \\ \hline
+        87  & 35,6 & 17,5 \\ \hline
+        88  & 35,5 & 17,5 \\ \hline
+        89  & 35,3 & 17,4 \\ \hline
+        90  & 35,1 & 17,4 \\ \hline
+        91  & 35,1 & 17,4 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        92  & 34,9 & 17,3 \\ \hline
+        93  & 34,8 & 17,3 \\ \hline
+        94  & 34,8 & 17,3 \\ \hline
+        95  & 34,7 & 17,3 \\ \hline
+        96  & 34,6 & 17,3 \\ \hline
+        97  & 34,6 & 17,3 \\ \hline
+        98  & 34,4 & 17,2 \\ \hline
+        99  & 34,4 & 17,3 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        100 & 34,2 & 17,2 \\ \hline
+        101 & 34,1 & 17,2 \\ \hline
+        102 & 34,0 & 17,2 \\ \hline
+        103 & 34,1 & 17,3 \\ \hline
+        104 & 34,1 & 17,3 \\ \hline
+        & & \\ \hline
+        & & \\ \hline
+        & & \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \caption{Datos $T_1$ e $T_2$ respecto ó tempo para $I = 1,0A$}
+    \label{cad:t_i_10}
+  \end{table}
+
+  \begin{table}[H]
+    \centering
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        105 & 33,6 & 17,8 \\ \hline
+        106 & 33,2 & 17,9 \\ \hline
+        107 & 32,8 & 18,0 \\ \hline
+        108 & 32,5 & 17,9 \\ \hline
+        109 & 32,2 & 18,0 \\ \hline
+        110 & 32,1 & 18,0 \\ \hline
+        111 & 31,9 & 17,9 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        112 & 31,7 & 17,9 \\ \hline
+        113 & 31,5 & 17,8 \\ \hline
+        114 & 31,4 & 17,7 \\ \hline
+        115 & 31,2 & 17,8 \\ \hline
+        116 & 31,0 & 17,7 \\ \hline
+        117 & 30,8 & 17,6 \\ \hline
+        118 & 30,7 & 17,7 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        119 & 30,6 & 17,7 \\ \hline
+        120 & 30,4 & 17,7 \\ \hline
+        121 & 30,3 & 17,7 \\ \hline
+        122 & 30,2 & 17,7 \\ \hline
+        123 & 30,1 & 17,8 \\ \hline
+        124 & 30,1 & 17,7 \\ \hline
+        125 & 29,9 & 17,7 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        126 & 29,8 & 17,7 \\ \hline
+        127 & 29,7 & 17,7 \\ \hline
+        128 & 29,6 & 17,6 \\ \hline
+        129 & 29,5 & 17,7 \\ \hline
+        130 & 29,4 & 17,6 \\ \hline
+        131 & 29,3 & 17,6 \\ \hline
+        132 & 29,3 & 17,7 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \caption{Datos $T_1$ e $T_2$ respecto ó tempo para $I = 1,5A$}
+    \label{cad:t_i_15}
+  \end{table}
+
+  \begin{table}[H]
+    \centering
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        133 & 29,1 & 18,1 \\ \hline
+        134 & 28,6 & 18,5 \\ \hline
+        135 & 28,3 & 18,5 \\ \hline
+        136 & 28,0 & 18,4 \\ \hline
+        137 & 27,8 & 18,3 \\ \hline
+        138 & 27,6 & 18,4 \\ \hline
+        139 & 27,3 & 18,4 \\ \hline
+        140 & 27,2 & 18,4 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        141 & 26,9 & 18,3 \\ \hline
+        142 & 26,8 & 18,2 \\ \hline
+        143 & 26,6 & 18,2 \\ \hline
+        144 & 26,4 & 18,1 \\ \hline
+        145 & 26,3 & 18,2 \\ \hline
+        146 & 26,1 & 18,1 \\ \hline
+        147 & 26,0 & 18,2 \\ \hline
+        148 & 25,8 & 18,2 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        149 & 25,7 & 18,1 \\ \hline
+        150 & 25,6 & 18,1 \\ \hline
+        151 & 25,5 & 18,2 \\ \hline
+        152 & 25,4 & 18,2 \\ \hline
+        153 & 25,3 & 18,2 \\ \hline
+        154 & 25,2 & 18,2 \\ \hline
+        155 & 25,1 & 18,2 \\ \hline
+        156 & 25,0 & 18,2 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        157 & 24,9 & 18,1 \\ \hline
+        158 & 24,8 & 18,0 \\ \hline
+        159 & 24,7 & 18,0 \\ \hline
+        160 & 24,5 & 17,9 \\ \hline
+        161 & 24,5 & 17,9 \\ \hline
+        162 & 24,3 & 18,0 \\ \hline
+        163 & 24,3 & 18,0 \\ \hline
+        & & \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \caption{Datos $T_1$ e $T_2$ respecto ó tempo para $I = 2,0A$}
+    \label{cad:t_i_20}
+  \end{table}
+
+  \begin{table}[H]
+    \centering
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        164 & 24,1 & 18,3 \\ \hline
+        165 & 23,7 & 18,7 \\ \hline
+        166 & 23,4 & 18,7 \\ \hline
+        167 & 23,2 & 18,8 \\ \hline
+        168 & 23,0 & 18,8 \\ \hline
+        169 & 22,9 & 18,7 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        170 & 22,7 & 18,7 \\ \hline
+        171 & 22,6 & 18,7 \\ \hline
+        172 & 22,4 & 18,6 \\ \hline
+        173 & 22,3 & 18,7 \\ \hline
+        174 & 22,1 & 18,6 \\ \hline
+        175 & 22,0 & 18,7 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        176 & 21,9 & 18,6 \\ \hline
+        177 & 21,9 & 18,6 \\ \hline
+        178 & 21,8 & 18,6 \\ \hline
+        179 & 21,6 & 18,6 \\ \hline
+        180 & 21,6 & 18,6 \\ \hline
+        181 & 21,5 & 18,5 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,24\textwidth}
+      \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t (min)$ & $T_1 (^\circ C)$ & $T_2 (^\circ C)$ \\ \hline
+        182 & 21,4 & 18,5 \\ \hline
+        183 & 21,3 & 18,5 \\ \hline
+        184 & 21,2 & 18,5 \\ \hline
+        185 & 21,1 & 18,6 \\ \hline
+        186 & 21,0 & 18,5 \\ \hline
+        187 & 21,0 & 18,5 \\ \hline
+        \end{tabular}}
+        \end{table}
+    \end{minipage}
+    \caption{Datos $T_1$ e $T_2$ respecto ó tempo para $I = 2,5A$}
+    \label{cad:t_i_25}
+  \end{table}
+
+  \subsection{Representación gráfica}
+
+  \begin{figure}[H]
+    %\centering
+    \hspace{12pt}
+    \input{todo.pgf}
+    \caption{Temperaturas $T_1$ e $T_2$ fronte ó tempo}
+    \label{fig:todo}
+  \end{figure}
+
+  Na figura anterior podemos ver a evolución do sistema co tempo. Ambas partes están compostas por cinco curvas diferenciadas, cuxas fronteiras son os momentos nos que incrementamos a intensidade.
+
+  Vemos que a parte azul, correspondente a $T_1$, ten un comportamento escalonado. Cada vez que aumentamos a intensidade o efecto Joule da corrente dentro do termoeléctrico repártese entre ambos extremos, e por ende aumente a temperatura da unión fría. Tamén vemos que incluso antes de cambiar a intensidade por primeira vez, esta unión se quentaba moi pouco a pouco. Isto se debe á transmisión de calor da unión quente á fría que xa analizamos na práctica anterior.
+
+  Pola súa banda, a liña vermella, representando $T_2$, primeiramente crece exponencialmente ata acadar o estado estacionario, onde o efecto Joule da resistencia e do termoeléctrico (aportando calor) e o efecto Peltier (restando calor) están en equilibrio.
+
+  Cando aumentamos a intensidade, o efecto Peltier do termoeléctrico faise máis potente e polo tanto o novo estado estacionario é de menor temperatura. A curva descenderá exponencialmente ata acadalo. Este proceso se repetirá cada vez que disminuamos a intensidade.
+
+  Non conseguimos que as curvas vermella e azul se cruzaran na baixada por falta de tempo, pero de seguir aumentando a intensidade estas chegarían a cruzarse, e nese punto o efecto Peltier pasa a ser máis potente que a combinación do efecto Joule da resistencia e do termoeléctrico, e a unión "quente" pasa a estar máis fría ca fría.
+
+  \subsection{Regresión non lineal}
+
+  Agora tomaremos cada unha das curvas diferenciadas de $T_2$ e realizaremos un axuste non lineal a unha función do tipo:
+  \begin{equation}
+    y = a + b \cdot e^{cx}
+  \end{equation}
+
+  Podemos identificar as variables desta regresión cos parámetros da ecuación (\ref{ec:t2_estacionario}):
+  \begin{gather}
+    y \equiv T_2(t) \qquad x \equiv t \nonumber \\
+    a \equiv T_2^\infty \qquad b \equiv -(T_2^\infty - T_2(0)) \qquad c \equiv -\frac{\lambda_T}{C} \label{ec:equivalencias_ajuste}
+  \end{gather}
+
+  Agora podemos utilizar \texttt{python} para facer unha regresión lineal e obter estes parámetros e as gráficas correspondentes:
+
+  \setlength{\abovecaptionskip}{-10pt}
+  \begin{figure}[H]
+    \centering
+    \begin{minipage}[c]{0,49\textwidth}
+      \begin{figure}[H]
+        \hspace{-26pt}
+        \resizebox{1,05\textwidth}{!}{
+        \input{i05r.pgf}}
+        \caption{$T_2$ con $I = 0,5A$}
+        \label{fig:i05}
+      \end{figure}
+    \end{minipage}
+    \begin{minipage}[c]{0,49\textwidth}
+      \begin{figure}[H]
+        \hspace{-26pt}
+        \resizebox{1,05\textwidth}{!}{
+        \input{i10r.pgf}}
+        \caption{$T_2$ con $I = 1,0A$}
+        \label{fig:i10}
+      \end{figure}
+    \end{minipage}
+    \begin{minipage}[c]{0,49\textwidth}
+      \begin{figure}[H]
+        \hspace{-26pt}
+        \resizebox{1,05\textwidth}{!}{
+        \input{i15r.pgf}}
+        \caption{$T_2$ con $I = 1,5A$}
+        \label{fig:i15}
+      \end{figure}
+    \end{minipage}
+    \begin{minipage}[c]{0,49\textwidth}
+      \begin{figure}[H]
+        \hspace{-26pt}
+        \resizebox{1,05\textwidth}{!}{
+        \input{i20r.pgf}}
+        \caption{$T_2$ con $I = 2,0A$}
+        \label{fig:i20}
+      \end{figure}
+    \end{minipage}
+    \begin{minipage}[c]{0,49\textwidth}
+      \begin{figure}[H]
+        \hspace{-26pt}
+        \resizebox{1,05\textwidth}{!}{
+        \input{i25r.pgf}}
+        \caption{$T_2$ con $I = 2,5A$}
+        \label{fig:i25}
+      \end{figure}
+    \end{minipage}
+  \end{figure}
+  \setlength{\abovecaptionskip}{10pt}
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{c|c|c|c|}
+    \cline{2-4}
+                                              & $\mathbf{a(K)}$               & $\mathbf{b(K)}$               & $\mathbf{c(s^{-1})}$   \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{I = 0,5V}$} & $311,956 \pm 0,077$ & $-27,280 \pm 0,085$ & $-(6.797 \pm 0,065) \cdot 10^{-4}$ \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{I = 1,0V}$} & $305,50 \pm 0,23$ & $5.02 \pm 0,20$ & $-(6.95 \pm 0,56) \cdot 10^{-4}$ \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{I = 1,5V}$} & $301,19 \pm 0,15$ & $5.55 \pm 0,11$ & $-(9.49 \pm 0,53) \cdot 10^{-4}$ \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{I = 2,0V}$} & $296,07 \pm 0,16$ & $6.12 \pm 0,13$ & $-(8.27 \pm 0,44) \cdot 10^{-4}$ \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{I = 2,5V}$} & $293,20 \pm 0,16$ & $3.99 \pm 0,13$ & $-(1.08 \pm 0,091) \cdot 10^{-3}$ \\ \hline
+    \end{tabular}
+    \caption{Valores do axuste non lineal}
+    \label{cad:valores_axuste}
+  \end{table}
+
+  \section{Calor de Peltier}
+
+  \subsection{Condutividade}
+
+  Utilizando as equivalencias dos parámetros do axuste anterior (\ref{ec:equivalencias_ajuste}) podemos despexar $\lambda_T$:
+  \begin{equation}
+    \lambda_T = C \cdot (-c) \qquad s(\lambda_T) = \sqrt{(c \cdot s(C))^2 + (C \cdot s(c))^2}
+    \label{ec:lambda_T}
+  \end{equation}
+
+  Tomando o valor da capacidade calorífica do cadro (\ref{cad:practica_seebeck}), $C = 1318 \pm 66 J/K$ podemos calcular o valor de $\lambda_T$ para cada estado estacionario:
+  l = 0.896+/-0.046
+  l = 0.916+/-0.087
+  l = 1.251+/-0.094
+  l = 1.090+/-0.080
+  l = 1.42+/-0.14
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+      \hline
+      $\mathbf{I (A)}$ & $\mathbf{0,5}$ & $\mathbf{1,0}$ & $\mathbf{1,5}$ & $\mathbf{2,0}$ & $\mathbf{2,5}$ \\ \hline
+      $\mathbf{\lambda_T (W/K)}$ & $0.896 \pm 0.046$ & $0.916 \pm 0.087$ & $1.251 \pm 0.094$ & $1.090 \pm 0.080$ & $1.42 \pm 0.14$ \\ \hline
+    \end{tabular}
+    \caption{Cálculo de $\lambda_T$ para distintos estados estacionarios}
+    \label{cad:lambda_t}
+  \end{table}
+
+  \subsection{Potencia de Fourier}
+
+  Podemos calcular a potencia do efecto Fourier coa seguinte expresión:
+  \begin{gather}
+    W_F = \lambda_T (T_2^\infty - \bar{T_1}) \label{ec:potencia_fourier} \\
+    s(W_F) = \sqrt{(\lambda_T \cdot s(T_2^\infty))^2 + (\lambda_T \cdot s(\bar{T_1}))^2 + ((T_2^\infty - \bar{T_1}) \cdot s(\lambda_T))^2} \nonumber
+  \end{gather}
+
+  Tomaremos como $T_1$ a media dos seus valores no intervalo no que estemos traballando, xa que apenas aumenta no intervalo.
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+      \hline
+      $\mathbf{I (A)}$ & $\mathbf{0,5}$ & $\mathbf{1,0}$ & $\mathbf{1,5}$ & $\mathbf{2,0}$ & $\mathbf{2,5}$ \\ \hline
+      $\mathbf{\bar{T_1} (K)}$ & $289.31 \pm 0,11$ & $290.35 \pm 0,10$ & $290.76 \pm 0,10$ & $291.19 \pm 0,10$ & $291.62 \pm 0,10$ \\ \hline
+    \end{tabular}
+    \caption{Media de $T_1$ para distintos estados estacionarios}
+    \label{cad:media_t1}
+  \end{table}
+
+  E agora podemos calcular as potencias de Fourier:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+      \hline
+      $\mathbf{I (A)}$ & $\mathbf{0,5}$ & $\mathbf{1,0}$ & $\mathbf{1,5}$ & $\mathbf{2,0}$ & $\mathbf{2,5}$ \\ \hline
+      $\mathbf{W_F (W)}$ & $20.3 \pm 1.0$ & $13.9 \pm 1.3$ & $13.0 \pm 1.0$ & $5.32 \pm 0.44$ & $2.25 \pm 0.35$ \\ \hline
+    \end{tabular}
+    \caption{Potencias de Fourier para distintos estados estacionarios}
+    \label{cad:potencia_fourier}
+  \end{table}
+
+  \subsection{Potencia da resistencia interna}
+
+  Para obter o valor da potencia do efecto Joule causado pola resistencia interna do módulo termoeléctrico utilizamos:
+  \begin{equation}
+    W_{r_i} = \frac{1}{2} I^2 r_i \qquad s(W_{r_i}) = \frac{1}{2} \sqrt{(2 I r_i \cdot s(I))^2 + (I^2 \cdot s(r_i))^2}
+    \label{ec:potencia_interna}
+  \end{equation}
+
+  Tomaremos o valor da resistencia interna que obtivemos na práctica do efecto Seebeck (\ref{cad:practica_seebeck}), $r_i = 4,650101 \pm 5,5 \cdot 10^{-5} \Omega$, e tomaremos a incertidumbre da intensidade como $s(I) = 0,01 A$. Agora podemos calcular a potencia de Joule para cada estacionario:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+      \hline
+      $\mathbf{I (A)}$ & $\mathbf{0,5}$ & $\mathbf{1,0}$ & $\mathbf{1,5}$ & $\mathbf{2,0}$ & $\mathbf{2,5}$ \\ \hline
+      $\mathbf{W_{r_i} (W)}$ & $0.581 \pm 0.023$ & $2.325 \pm 0.047$ & $5.231 \pm 0.070$ & $9.300 \pm 0.093$ & $14.53 \pm 0.12$ \\ \hline
+    \end{tabular}
+    \caption{Potencias de Joule da resistencia interna para distintos estados estacionarios}
+    \label{cad:potencia_interna}
+  \end{table}
+
+  \subsection{Potencia da resistencia calefactora}
+
+  Finalmente temos que calcular a potencia xerada pola resistencia calefactora. Esta será constante xa que non variamos o voltaxe aplicado. Empregamos:
+  \begin{equation}
+    W_{R_C} = \frac{V^2}{R_C} \qquad s(W_{R_C}) = \sqrt{(\frac{2s(V)}{V})^2 + (\frac{2s(R_C)}{R_C})^2}
+    \label{ec:potencia_calefactora}
+  \end{equation}
+
+  A medición do voltímetro da $V = 152,0 \pm 0,5V$ (engadimos incertidumbre porque variaba un pouco). Tomamos o valor de $R_C$ obtido na práctica anterior (\ref{cad:practica_seebeck}), $R_C = 818,5 \pm 1,0 \Omega$. Con todos os datos, calculamos a potencia da resistencia calefactora:
+  \begin{equation}
+    W_{R_C} = 28.23 \pm 0.19 W
+    \label{ec:potencia_calefactora_valor}
+  \end{equation}
+
+  \subsection{Resultados do calor de Peltier}
+
+  Con todas as potencias podemos finalmente calcular o calor de Peltier:
+  \begin{equation}
+    \dot{Q}_P = W_{R_C} + W_{r_i} - W_F
+  \end{equation}
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+      \hline
+      $\mathbf{I (A)}$ & $\mathbf{0,5}$ & $\mathbf{1,0}$ & $\mathbf{1,5}$ & $\mathbf{2,0}$ & $\mathbf{2,5}$ \\ \hline
+      $\mathbf{\dot{Q}_P (W)}$ & $8.5 \pm 1.1$ & $16.7 \pm 1.4$ & $20.4 \pm 1.0$ & $32.21 \pm 0.49$ & $40.51 \pm 0.41$ \\ \hline
+    \end{tabular}
+    \caption{Calor de Peltier para distintos estados estacionarios}
+    \label{cad:calor_peltier}
+  \end{table}
+
+  \newpage
+  \section{Coeficiente de Peltier}
+
+  Se temos en conta a ecuación (\ref{ec:peltier}) podemos axustar mediante unha regresión lineal sen término independiente $\dot{Q}_P$ e $I$ para obter o coeficiente de Peltier, $\pi_{AB}$. Utilizamos os datos do cadro anterior (\ref{cad:calor_peltier}) e \texttt{python} para facer un axuste ponderado por mínimos cadrados:
+
+  \begin{figure}[H]
+    \hspace{12pt}
+    \input{reg.pgf}
+    \caption{Regresión lineal ponderada sen término independiente de $\dot{Q}_P (W)$ fronte a $I$}
+    \label{fig:calor_peltier_reg}
+  \end{figure}
+
+  Cun axuste de 3 noves, con $R^2 = 0.9995$, finalmente obtemos o coeficiente de Peltier, obxetivo último da práctica:
+  \begin{equation}
+    \pi_{AB} = 16.08 \pm 0,13 W/A
+    \label{ec:coef_peltier}
+  \end{equation}
+
+  \newpage
+  \part{Conclusións}
+
+  O obxetivo desta práctica era o estudo do efecto Peltier: nos extremos de dous materiais conductores sometidos a unha diferencia de potencial prodúcese un fluxo de calor. Para iso realizamos unhas experiencias e cálculos co fin de obter o coeficiente de Peltier do módulo termoeléctrico co que traballamos.
+
+  Finalmente calculamos un valor de $\pi_{AB}$, pero non podemos comprobar a súa adecuación á realidade xa que non temos unha referencia do valor tabulado, como sí tíñamos na práctica anterior para o coeficiente de Seebeck.
+
+  As posibles fontes de erro son varias. Primeiramente, tomamos datos para os cálculos directamente da práctica anterior. Se ben estes tiñan apróximadamente un valor razoable, os posibles erros desa práctica trasládanse ó resultado desta. Xa discutimos todolas fontes de incertidumbre, pero cabería destacar especialmente o mal funcionamento do termómetro durante a primeira metade da mesma. Polo tanto, é posible que os valores que tomamos como seguros non sexan tan precisos e introduxeran erros.
+
+  Outros posibles factores son a variación da temperatura do foco frío polo calor do quente. As condicións do laboratorio, debido a ventilación obligatoria, tamén puideron contribuír a turbulencias na temperatura, asímesmo a variación da auga do grifo, aínda que de existir estas serían despreciables frente a outras fontes máis claras. Por último, tamén é posible a existencia de erros humanos pola nosa parte na toma de datos ou montaxe experimental.
+
+  Con todo, dende un punto de vista cualitativo, os datos parecen ter sentido e non son moi disparatados, asímesmo as incertidumbres. A valoración da práctica é pois positiva.
+
+\end{document}
