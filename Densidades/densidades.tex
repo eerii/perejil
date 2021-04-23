@@ -1,0 +1,600 @@
+\documentclass[12pt, a4paper, titlepage]{article}
+
+%INFORMACIÓN
+\title{\textbf{\Huge{Medida de Densidades}\\\LARGE{Sistema Binario}}\\\textbf{\large \textit{Laboratorio de termodinámica (D)}}}
+\author{{\Large José Pazos Pérez}\\Grupo T2a}
+\date{}
+
+%PAQUETES
+%---
+%Idioma
+\usepackage[spanish,es-tabla,galician]{babel} %Convencións idiomáticas
+\selectlanguage{galician} %Elexir un idioma no ca so de varios
+%---
+%Cores
+\usepackage[dvipsnames]{xcolor} %Colorear texto e cores básicas
+\usepackage{colortbl} %Colorear celdas de tablas
+%Definir cores personalizadas
+\definecolor{Azul}{RGB}{110, 176, 230}
+\definecolor{Vermello}{RGB}{222, 94, 80}
+\definecolor{Link}{RGB}{20, 88, 224}
+%---
+%Estrutura
+\usepackage[margin=2.5cm]{geometry} %Márxenes
+\usepackage[skip=12pt]{parskip} %Espacio tras os parágrafos
+\linespread{1.3} %Interlineado
+\usepackage{float} %Controlar o posicionamento dos obxetos con [H]
+\usepackage[toc,page]{appendix} %Apéndices
+\renewcommand{\appendixpagename}{Apéndices} %Cambiar o nome
+\renewcommand{\appendixtocname}{\large Apéndices}
+\renewcommand{\appendixname}{Apéndices}
+\usepackage{chngcntr} %Resetear o contador de Secciones cada Parte
+\counterwithin*{section}{part}
+%---
+%Funcións
+\usepackage[centertags]{amsmath} %Funcións matemáticas esenciais
+\usepackage{hyperref} %Crear hipervínculos
+\hypersetup{
+    colorlinks=true,
+    linkcolor=Link,
+    filecolor=Vermello,
+    urlcolor=Azul,
+}
+%\usepackage[siunitx]{circuitikz} %Debuxar circuitos por código, fai que a compilación sexa máis lenta
+%---
+%Sintaxis
+%\usepackage{minted} %Sintáxis para código de Python
+%IMPORTANTE: Necesitas una versión actual de Python y el paquete Pygments.
+%Instálalo utilizando pip, ya sea con pip3 install pygments, python3 -m pip install pygments, python -m pip install pygments o la versión correspondiente a tu sistema
+%Tamén tes que cambiar a configuración de latexmk para utilizar a opción "-shell-escape".
+%Ver toda a información en http://tug.ctan.org/macros/latex/contrib/minted/minted.pdf
+%---
+%Soporte de arquivos
+\usepackage{graphicx} %Imáxes
+%\usepackage{csvsimple} %Tablas .csv
+\usepackage{pgfplots} %Gráficas vectoriais dende matplotlib .pgf
+\pgfplotsset{compat=1.16}
+%---
+%Correccións extra
+%Conflicto entre pgfplots e mathbb
+\protected\edef\mathbb{%
+  \unexpanded\expandafter\expandafter\expandafter{%
+    \csname mathbb \endcsname
+  }%
+}
+%Quitar o título "Referencias" da bibliografía
+\usepackage{etoolbox}
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
+%---
+
+\begin{document}
+  \maketitle
+
+  \tableofcontents
+
+
+
+  \newpage
+  \part{Introducción}
+
+  \section{Obxetivos}
+
+  A finalidade primeira desta práctica é o estudo da relación entre a densidade dun sistema binario (auga-etanol) e as concentracións dos seus compoñentes.
+  Para isto mediremos a densidade de sendas mostras con distintas concentracións de auga e etanol a unha serie de temperaturas.
+  Con esta información, ademáis, calcularemos os volumes molares de exceso, aparente e parcial.
+
+  \section{Material}
+
+  Esta práctica de laboratorio require dos seguintes instrumentos e produtos:
+
+  \begin{itemize}
+    \setlength\itemsep{-4pt}
+    \item Auga destilada ($H_2O$)
+    \item Etanol $96\%$ en volume ($C_2H_5OH$\footnote{De aquí en adiante simplificaremos por $OH$. O produto utilizado especificaba que do $96\%$ en volume contiña un $99,9\%$ de etanol e un $0,01\%$ de cloruro de benzalconio. Por razóns prácticas despreciaremos esta pequena diferencia e asumiremos un $96\%$ de etanol puro.})
+    \item Frascos estancos e numerados
+    \item Balanza dixital, con precisión de $0,001g$
+    \item Xiringas e pipetas
+    \item Baño de auga morna con quentador a $\sim 45 ^\circ C$
+    \item Densímetro
+  \end{itemize}
+
+  \newpage
+  \section{O problema de estudo}
+
+  Segundo o primeiro principio da termodinámica un sistema pode intercambiar enerxía mediante a calor e o traballo. Nos sistemas con varios componentes esta enerxía pode variar en función da cantidade de materia que se intercambia:
+  \begin{equation}
+    dU = TdS - pdV + \sum \mu_i dn_i
+    \label{ec:primeiro_principio}
+  \end{equation}
+
+  Este intercambio de materia está relacionado directamente ca densidade do sistema multicompoñente. As sustancias que utilizaremos non teñen a mesma densidade, pero é lóxico pensar que a densidade do sistema dependerá das densidades de ambas. Podemos definir o conecpto de fracción molar como o porcentaxe dunha sustancia respecto ó total. Neste caso teremos só dous compoñentes, así que sendo $n_i$ o número de moles da sustancia $i$:
+  \begin{equation}
+    \chi_i = \frac{n_i}{n_1 + n_2} \qquad n_i = \frac{m_i}{M_i} \qquad (i = 1, 2)
+    \label{ec:fraccion_molar}
+  \end{equation}
+
+  Nun sistema binario, como o seu nome indica, hai dous compoñentes:
+  \begin{itemize}
+    \setlength\itemsep{-4pt}
+    \item Compoñente 1: $n_1$ moles, masa molar $M_1$ e volume molar $v_1^0$.
+    \item Compoñente 2: $n_2$ moles, masa molar $M_2$ e volume molar $v_2^0$.
+  \end{itemize}
+
+  Podemos definir dous estados diferenciados:
+  \begin{itemize}
+    \setlength\itemsep{-4pt}
+    \item Antes da mezcla: O volume total é $V^0 = n_1 v_1^0 + n_2 v_2^0$.
+    \item Despois da mezcla: O volume varía polas interacciones entre ambas sustancias, polo que temos $V = n_1 \bar{v}_1 + n_2 \bar{v}_2$. Chamamos volumes molares parciais a $\bar{v}_i$
+  \end{itemize}
+
+  O volume da mezcla será a diferencia entre ambas expresións:
+  \begin{equation}
+    V^M = V - V^0 = n_1 (\bar{v}_1 - v_1^0) + n_2 (\bar{v}_2 - v_2^0)
+    \label{ec:volume_mezcla}
+  \end{equation}
+
+  Chamamos ideais a aqueles compoñentes $i$ cuxos potenciais químicos son da forma:
+  \begin{equation}
+    \mu_i = \mu_i^0 + RT \ln \chi_i
+    \label{ec:potencial_quimico_ideal}
+  \end{equation}
+
+  Cando a fracción molar dun compoñente tende a $1$, estes pódense considerar ideais. Sen embargo, cando disminúe $\chi$ aparecen desviacións.
+
+  \subsection{Volume molar de exceso}
+
+  O volume de exceso é a diferencia entre o volume da mezcla real e o que tería de comportarse de maneira ideal. Como este último é nulo o volume de exceso é:
+  \begin{equation}
+    V^E = V^M - V^M_{ideal} = V^M
+    \label{ec:volume_exceso}
+  \end{equation}
+
+  Se dividimos $V_E$ polo numero de moles obtemos o \textbf{volume molar de exceso}. Se chamamos $\rho$ á densidade da mezcla e $\rho_i^0$ á do compoñente $i$, ambas medidas a unha temperatura $T$ fixa, podemos expresar $v^E$ coa seguinte fórmula:
+  \begin{equation}
+    v^E = \frac{V^E}{n} = \frac{\chi_1 M_1 + \chi_2 M_2}{\rho} - \left( \frac{\chi_1 M_1}{\rho_1^0} + \frac{\chi_2 M_2}{\rho_2^0} \right)
+    \label{ec:volume_molar_exceso}
+  \end{equation}
+
+  \subsection{Volume molar aparente}
+
+  Podemos adxudicarlle todo o cambio do volume ó soluto, mantendo constante o do disolvente (neste caso $1$). Entón, definimos o volume molar aparente $v_\phi$ como:
+  \begin{equation}
+    V = n_1 v_1^0 + n_2 v_\phi \qquad v_\phi = \frac{V}{n_2} - \frac{n_1 v_1^0}{n_2} = \frac{M_2}{\rho} + \frac{m_1}{n_2} \left( \frac{1}{\rho} - \frac{1}{\rho^0_1} \right)
+    \label{ec:volume_molar_aparente}
+  \end{equation}
+
+  \subsection{Volume molar parcial}
+
+  Denotamos como volumes molares parciais ós $v_i$ da fórmula $V = n_1 \bar{v}_1 + n_2 \bar{v}_2$. Ademáis, se tomamos a fórmula do volume molar aparente (\ref{ec:volume_molar_aparente}), e mantendo $1$ como disolvente e $2$ como soluto, podemos escribir:
+  \begin{equation}
+    \bar{v_2} = \left( \frac{\partial V}{\partial n_2} \right)_{T,p} = v_\phi + n_2 \left( \frac{\partial v_\phi}{\partial n_2} \right)_{T,p}
+  \end{equation}
+
+  Declaramos $m = \frac{n_2}{m_1}$ e aplicando a regra da cadena obtemos:
+  \begin{gather}
+    \frac{\partial v_\phi}{\partial n_2} = \frac{\partial v_\phi}{\partial m} \frac{\partial m}{\partial n_2} = \frac{1}{m_1} \frac{\partial v_\phi}{\partial m} \qquad \bar{v}_2 = v_\phi + m \left( \frac{\partial v_\phi}{\partial m} \right)_{T,p} \nonumber \\
+    \bar{v}_2 = v_\phi - \frac{1}{m} \left( \frac{1}{\rho} - \frac{1}{\rho^0_1} \right) = \frac{M_2}{\rho} \label{ec:volume_molar_parcial}
+  \end{gather}
+
+
+  \newpage
+  \part{Procedemento experimental}
+
+  \section{Cálculo das masas}
+
+  Antes de comezar coa práctica debemos calcular as masas de auga e de etanol para cada concentración. Para ter un marxe de erro por se acaso algunha medida non sae á primeira, prepararemos $20g$ de cada disolución, así que $m_{H_2O} + m_{OH} = 20g$.
+
+  \subsection{Masas sen corrección}
+
+  Podemos utilizar a expresión da fracción molar (\ref{ec:fraccion_molar}) e despexar a masa de $H_2O$:
+  \begin{equation}
+    \chi_{H_2O} = \frac{\frac{m_{H_2O}}{M_{H_2O}}}{\frac{m_{H_2O}}{M_{H_2O}} + \frac{m_{OH}}{M_{OH}}} \qquad m_{H_2O} = \frac{20 \cdot M_{H_2O} \cdot \chi_{H_2O}}{M_{OH} \cdot (1 - \chi_{H_2O}) + M_{H_2O} \cdot \chi_{H_2O}}
+    \label{ec:masa_h2o}
+  \end{equation}
+
+  Os valores teóricos das masas molares da auga \cite{webqc_h2o} e do etanol \cite{webqc_oh} son:
+  \begin{equation*}
+    M_{H_2O} = 18.016 \ g/mol \qquad M_{OH} = 46.068 \ g/mol
+  \end{equation*}
+  Tomamos os valores con tres cifras significativas e unha incertidumbre de $0,001g/mol$ xa que a balanza que utilizaremos tamén ten tres cifras significativas (máis adiante veremos que ten unha imprecisión máis grande por outros factores).
+  Sustituíndo na fórmula (\ref{ec:masa_h2o}) obtemos un cadro de masas para cada densidade (con $m_{OH} = 20g - m_{H_2O}$):
+  
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    $\chi_{H_2O}$ & $m_{H_2O} (g)$ & $m_{OH} (g)$ \\ \hline
+    $ 0.0 $  &  $ 0.000 $  &  $ 20.000 $ \\ \hline
+    $ 0.1 $  &  $ 0.833 $  &  $ 19.167 $ \\ \hline
+    $ 0.2 $  &  $ 1.781 $  &  $ 18.219 $ \\ \hline
+    $ 0.3 $  &  $ 2.871 $  &  $ 17.129 $ \\ \hline
+    $ 0.4 $  &  $ 4.136 $  &  $ 15.864 $ \\ \hline
+    $ 0.5 $  &  $ 5.623 $  &  $ 14.377 $ \\ \hline
+    $ 0.6 $  &  $ 7.395 $  &  $ 12.605 $ \\ \hline
+    $ 0.7 $  &  $ 9.543 $  &  $ 10.457 $ \\ \hline
+    $ 0.8 $  &  $ 12.201 $  &  $ 7.799 $ \\ \hline
+    $ 0.9 $  &  $ 15.575 $  &  $ 4.425 $ \\ \hline
+    $ 1.0 $  &  $ 20.000 $  &  $ 0.000 $ \\ \hline
+    \end{tabular}
+    \caption{Masas sen corrección}
+    \label{cad:masas_sen_correccion}
+  \end{table}
+  
+  No cadro anterior despreciamos a incertidumbre pois os valores eran $<0,001$ e non podemos medir tan preciso. Sen embargo, estes valor sí teñen un problema, e é que o etanol do laboratorio non é puro, se non $96 \%$ en volume.
+  
+  \subsection{Masas con corrección}
+
+  Queremos obter a masa total de auga, $m_{H_2O}$, e a de etanol, $m_{OH}$. Para iso utilizaremos masa de auga destilada que medimos no laboratorio, $m$, que non inclúe a auga que procede do etanol, así como a masa de alcohol $96 \%$, $m_96$, a que medimos cando botamos a disolución de etanol.
+  \begin{gather}
+    m_{H_2O} = m + (1 - 0,96) \cdot V_{96} \cdot \rho_{H_2O} = m + 0,04 \cdot m_{96} \cdot \frac{\rho_{H_2O}}{\rho_{96}} \label{ec:masa_real_h2o} \\
+    m_{OH} = 0,96 \cdot V_{96} \cdot \rho_{OH} = 0,96 \cdot m_{96} \cdot \frac{\rho_{OH}}{\rho_{96}} \label{ec:masa_real_oh}
+  \end{gather}
+
+  Tendo en conta esta modificación temos que corrixir a ecuación para o cálculo de masa de auga (\ref{ec:masa_h2o})
+  \begin{equation}
+    m = 20 \cdot \frac{0.04 \cdot \frac{\rho_{H_2O}}{\rho_{96}} - \chi_{H_2O} \cdot \left( 0.04 \cdot \frac{\rho_{H_2O}}{\rho_{96}} + 0.96 \cdot \frac{\rho_{OH}}{\rho_{96}} \cdot \frac{M_{H_2O}}{M_{OH}} \right)}{\chi_{H_2O} \cdot \left(1 - 0.04 \cdot \frac{\rho_{H_2O}}{\rho_{96}} - 0.96 \cdot \frac{\rho_{OH}}{\rho_{96}} \cdot \frac{M_{H_2O}}{M_{OH}} \right) + 0.04 \cdot \frac{\rho_{OH}}{\rho_{96}} - 1}
+    \label{ec:masa_h2o_corrixida}
+  \end{equation}
+
+  Coñecendo os valores teóricos das distintas densidades \cite{wolfram}, \cite{ethanol}:
+  \begin{equation*}
+    \rho_{H_2O} = 1,000 \ g/cm^3 \qquad \rho_{OH} = 0,789 \ g/cm^3 \qquad \rho_{96} = 0,808 \pm 0,004 \ g/cm^3
+  \end{equation*}
+
+  Podemos calcular un novo cadro cos datos necesarios para obter realmente esas fraccións molares:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    $\chi_{H_2O}$ & $m_{H_2O} (g)$ & $m_{OH} (g)$ & $s(m) (g)$ \\ \hline
+    $ 0.0 $  &  $ -1.048 $  &  $ 21.042 $ & $0.005$ \\ \hline
+    $ 0.1 $  &  $ -0.177 $  &  $ 20.177 $ & $0.001$ \\ \hline
+    $ 0.2 $  &  $ 0.809 $  &  $ 19.191 $ & $0.004$ \\ \hline
+    $ 0.3 $  &  $ 1.943 $  &  $ 18.056 $ & $0.009$ \\ \hline
+    $ 0.4 $  &  $ 3.262 $  &  $ 16.738 $ & $0.014$ \\ \hline
+    $ 0.5 $  &  $ 4.815 $  &  $ 15.185 $ & $0.018$ \\ \hline
+    $ 0.6 $  &  $ 6.670 $  &  $ 13.330 $ & $0.022$ \\ \hline
+    $ 0.7 $  &  $ 8.925 $  &  $ 11.075 $ & $0.024$ \\ \hline
+    $ 0.8 $  &  $ 11.725 $  &  $ 8.275 $ & $0.024$ \\ \hline
+    $ 0.9 $  &  $ 15.294 $  &  $ 4.706 $ & $0.018$ \\ \hline
+    $ 1.0 $  &  $ 20.000 $  &  $ 0,000 $ & $0.001$ \\ \hline
+    \end{tabular}
+    \caption{Masas con corrección}
+    \label{cad:masas_con_correccion}
+  \end{table}
+
+  A vista dos datos, pode resultar curioso que para concentracións menores a apróximadamente $0,12$ a masa de auga pasa a ser negativa. Isto ocurre xa que o etanol utilizado non é puro, e polo tanto, engadindo etanol tamén se está engadindo auga, polo que nunca poderá alcanzar unha concentración de $0$.
+
+  \subsection{Fraccións molares reais}
+
+  No laboratorio, nos non empregamos as masas exactas do cadro (\ref{cad:masas_con_correccion}), se non as primeiras (\ref{cad:masas_sen_correccion}), polo que non teremos as fraccións molares xustas. Por iso imos calcular o resultado á inversa, a qué fracción molar real corresponden as masas que medimos. Indicaremos agora a formúla pero faremos o cálculo tras as medicións:
+  \begin{equation}
+    \chi_{H_2O}^{real} = \frac{1}{1 + \frac{M_{H_2O}}{M_{OH}} \frac{0,96 \cdot m_{96} \cdot \rho_{OH}}{m_{H_2O} \cdot \rho_{96} + 0,04 \cdot m_{96} \cdot \rho_{H_2O}}}
+    \label{ec:fraccions_molares_reais}
+  \end{equation}
+
+  A incertidumbre das medidas de masas será $s(m) = 0,011g$ (calculado no apartado \ref{sec:preparacion_mostras}). Utilizando este dato, expoñemos a continuación as fraccións molares reais das mezclas:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    $m_{H_2O} (g)$ & $m_{OH} (g)$ & $\chi_{H_2O}^{real}$ & $s(\chi_{H_2O}^{real})$ \\ \hline
+    $ 0.000 $  &  $ 20.000 $  &  $ 0.1190 $  &  $ 0.0012 $ \\ \hline
+    $ 0.833 $  &  $ 19.167 $  &  $ 0.2023 $  &  $ 0.0011 $ \\ \hline
+    $ 1.781 $  &  $ 18.219 $  &  $ 0.2866 $  &  $ 0.0011 $ \\ \hline
+    $ 2.871 $  &  $ 17.129 $  &  $ 0.3719 $  &  $ 0.0011 $ \\ \hline
+    $ 4.136 $  &  $ 15.864 $  &  $ 0.4583 $  &  $ 0.0012 $ \\ \hline
+    $ 5.623 $  &  $ 14.377 $  &  $ 0.5458 $  &  $ 0.0012 $ \\ \hline
+    $ 7.395 $  &  $ 12.605 $  &  $ 0.6344 $  &  $ 0.0011 $ \\ \hline
+    $ 9.543 $  &  $ 10.457 $  &  $ 0.72407 $  &  $ 0.00098 $ \\ \hline
+    $ 12.201 $  &  $ 7.799 $  &  $ 0.81488 $  &  $ 0.00076 $ \\ \hline
+    $ 15.575 $  &  $ 4.425 $  &  $ 0.90685 $  &  $ 0.00047 $ \\ \hline
+    $ 20.000 $  &  $ 0.000 $  &  $ 1.00000 $  &  $ 0.00020 $ \\ \hline
+    \end{tabular}
+    \caption{Distintas concentracións coas suas fraccións molares reais}
+    \label{cad:fraccions_molares_reais}
+  \end{table}
+
+  \newpage
+  \section{Procedemento}
+
+  \subsection{Preparación das mostras}
+  \label{sec:preparacion_mostras}
+
+  Agora podemos proceder á preparación das mostras. Engadiremos auga ó frasco ata o valor máis próximo ó teórico (cadro \ref{cad:masas_sen_correccion}). Logo poñeremos a cero a balanza, e engadiremos o valor teórico de etanol. Isto o facemos para evitar un erro sistemático na segunda medición.
+
+  A balanza dixital ten unha precisión de 3 cifras significativas, sen embargo, observamos que variacións na presión do aire facían que os valores que tomaba oscilasen sobre $0,005 g$. É moi probable que isto se deba a que as ventás tiveron que permanecer abertas durante a práctica.
+
+  A iso temos que engadir a nosa capacidade de medición coa pipeta, que estimamos nunha precisión de $0,01 g$. Se aplicamos que $s_A = 0,005$, $s_B = 0,01$ e $s = \sqrt{s_A^2 + s_B^2}$ obtemos unha incertidumbre total para a balanza de $s = 0,011g$.
+
+  Conforme vaiamos rematando os frascos, os pechamos ben e os introducimos no baño de auga morna a $\sim 45 ^\circ C$. Repetimos para todas as concentracións.
+
+  \subsection{Medición}
+
+  O proceso de medición comeza asegurándose de que o densímetro non ten líquido no seu interior, expulsandoó cunha xiringa. Decidimos utilizar a cámara do teléfono para grabar a pantalla do densímetro e posteriormente anotar os datos, para evitar erros por ir ás prisas.
+
+  Mentres un dos compañeiros toma un bote do baño quente, mantendoó dentro ata a metade para que non perda calor, pero con cuidado de que non entre auga, o outro enche unha xiringa co líquido do bote.
+
+  A continuación, e con rapidez, introduce o líquido polo tubo lateral do densímetro. Hai que ter especial cuidado de que non quede ningunha burbulla no tubo central do densímetro.
+
+  Anotaremos os pares $(T, \rho)$ entre $32,0 ^\circ C$ e $27,0 ^\circ C$ a intervalos de $0,5 ^\circ C$.
+
+  \newpage
+  \section{Análise dos datos}
+
+  \subsection{Densidades}
+  \label{sec:densidades}
+
+  A continuación presentamos as medidas das densidades $\rho$ que obtivemos para cada concentración $\chi_{H_2O}$ e temperatura $T$. As incertidumbres do densímetro son $s(T) = 0,1 ^\circ C$ e $s(\rho) = 0,0001 g/cm^3$.
+
+  \begin{table}[H]
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|}
+    \cline{2-12}
+                                                                 & \multicolumn{11}{c|}{$\mathbf{\rho (g/cm^3)}$ para cada $\sim \mathbf{\chi_{H_2O}}$}                                                                                                            \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{T (^\circ C)}$} & \textbf{0,0} & \textbf{0,1} & \textbf{0,2} & \textbf{0,3} & \textbf{0,4} & \textbf{0,5} & \textbf{0,6} & \textbf{0,7} & \textbf{0,8} & \textbf{0,9} & \textbf{1,0} \\ \hline
+    \rowcolor[HTML]{fff2f4} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{fff2f4}32,0}           & 0,7964       & 0,8069       & 0,8192       & 0,8323       & 0,8469       & 0,8642       & 0,8838       & 0,9084       & 0,9357       & 0,9604       & 0,9953       \\ \hline
+    \rowcolor[HTML]{fff2f7} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{fff2f7}31,5}           & 0,7969       & 0,8072       & 0,8196       & 0,8328       & 0,8474       & 0,8646       & 0,8842       & 0,9088       & 0,9361       & 0,9607       & 0,9955       \\ \hline
+    \rowcolor[HTML]{fff2fb} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{fff2fb}31,0}           & 0,7974       & 0,8081       & 0,8201       & 0,8333       & 0,8479       & 0,8650       & 0,8846       & 0,9092       & 0,9365       & 0,9610       & 0,9957       \\ \hline
+    \rowcolor[HTML]{fff2fe} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{fff2fe}30,5}           & 0,7979       & 0,8086       & 0,8205       & 0,8338       & 0,8483       & 0,8654       & 0,8850       & 0,9095       & 0,9369       & 0,9613       & 0,9959       \\ \hline
+    \rowcolor[HTML]{fcf2ff} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{fcf2ff}30,0}           & 0,7983       & 0,8090       & 0,8209       & 0,8342       & 0,8487       & 0,8658       & 0,8854       & 0,9099       & 0,9372       & 0,9616       & 0,9961       \\ \hline
+    \rowcolor[HTML]{faf2ff} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{faf2ff}29,5}           & 0,7987       & 0,8093       & 0,8213       & 0,8347       & 0,8490       & 0,8662       & 0,8858       & 0,9103       & 0,9376       & 0,9618       & 0,9963       \\ \hline
+    \rowcolor[HTML]{f8f2ff} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{f8f2ff}29,0}           & 0,7991       & 0,8097       & 0,8217       & 0,8351       & 0,8496       & 0,8666       & 0,8862       & 0,9106       & 0,9379       & 0,9621       & 0,9964       \\ \hline
+    \rowcolor[HTML]{f6f2ff} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{f6f2ff}28,5}           & 0,7996       & 0,8102       & 0,8221       & 0,8354       & 0,8499       & 0,8671       & 0,8866       & 0,9110       & 0,9382       & 0,9624       & 0,9966       \\ \hline
+    \rowcolor[HTML]{f2f2ff} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{f2f2ff}28,0}           & 0,8000       & 0,8106       & 0,8225       & 0,8359       & 0,8503       & 0,8675       & 0,8870       & 0,9113       & 0,9386       & 0,9627       & 0,9967       \\ \hline
+    \rowcolor[HTML]{f2f4ff} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{f2f4ff}27,5}           & 0,8004       & 0,8110       & 0,8229       & 0,8363       & 0,8508       & 0,8679       & 0,8874       & 0,9117       & 0,9389       & 0,9629       & 0,9969       \\ \hline
+    \rowcolor[HTML]{f2f7ff} 
+    \multicolumn{1}{|c|}{\cellcolor[HTML]{f2f7ff}27,0}           & 0,8008       & 0,8114       & 0,8233       & 0,8367       & 0,8512       & 0,8684       & 0,8878       & 0,9121       & 0,9393       & 0,9632       & 0,9970       \\ \hline
+    \end{tabular}}
+    \caption{Densidades respecto ás concentracións e temperaturas}
+  \end{table}
+
+  \begin{figure}[H]
+    \hspace{-24pt}
+    \input{dens.pgf}
+    \caption{Densidades frente ó tempo con regresión lineal}
+    \label{fig:densidades}
+  \end{figure}
+
+  En todas as medicións, podemos ver como a densidade aumenta conforme descende a temperatura, e que, previsiblemente, tamén aumenta a maior concentración de auga.
+
+  Agora queremos analizar os datos dunha isoterma para ver como varía a densidade coa concentración exactamente. Para isto, tomaremos $T = 28,0 ^\circ C$ por ser a que mellor coeficiente $R^2$ ten unha vez feito o axuste.
+  
+  \begin{figure}[H]
+    \hspace{-24pt}
+    \input{t28.pgf}
+    \caption{Densidade frente a concentración na isoterma $T = 28,0 ^\circ C$}
+    \label{fig:t28}
+  \end{figure}
+
+  Esta gráfica a axustamos a un polinomio de grado 2 da forma $\rho = A + B \cdot \chi + C \cdot \chi^2$ e obtemos os seguintes parámetros de regresión:
+  \begin{equation*}
+    A = 0.8017 \pm 0,0012 \qquad B = 0,0728 \pm 0,0057 \qquad C = 0,1207 \pm 0,0055 \qquad R^2 = 0,9995 
+  \end{equation*}
+
+  Agora podemos relacionar a densidade e a fracción molar:
+  \begin{equation}
+    \rho = 0.8017 + 0,0728 \cdot \chi_{H_2O} + 0,1207 \cdot (\chi_{H_2O})^2
+    \label{ec:relacion_densidade_fraccion_molar}
+  \end{equation}
+
+  Ademáis, comprobaremos esta relación para valores coñecidos de $\chi_{H_2O}$, e vemos que coinciden bastante ben cos valores teóricos:
+  \begin{itemize}
+    \setlength\itemsep{-4pt}
+    \item \textbf{Auga pura} ($\chi_{H_2O} = 1$): $\rho = 0.9952 \pm 0.0080 \ g/cm^3$
+    \item \textbf{Etanol $\mathbf{96\%}$} ($\chi_{96} = 0.11897$): $\rho = 0.8121 \pm 0.0014 \ g/cm^3$
+  \end{itemize}
+
+  \subsection{Volume molar de exceso}
+  \label{sec:v_exceso}
+
+  Se recordamos do primeiro apartado, a fórmula do volume molar de exceso (\ref{ec:volume_molar_exceso}) é:
+  \begin{equation*}
+    v^E = \frac{\chi_{H_2O} M_{H_2O} + (1 - \chi_{H_2O}) M_{OH}}{\rho} - \left( \frac{\chi_{H_2O} M_{H_2O}}{\rho_{H_2O}} + \frac{(1 - \chi_{H_2O}) M_{OH}}{\rho_{OH}} \right)
+  \end{equation*}
+
+  Utilizaremos as fraccións molares reais calculadas no cadro (\ref{cad:fraccions_molares_reais}). Procesando os datos obtemos os seguintes resultados:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    $\chi_{H_2O}^{real}$ & $s(\chi_{H_2O}^{real})$ & $v^E (cm^3/mol)$ & $s(v^E) (cm^3/mol)$ \\ \hline
+    $0.1190 $ & $0.0012$ & $-0.1715$ & $0.0091$ \\ \hline
+    $0.2023 $ & $0.0011$ & $-0.3897$ & $0.0087$ \\ \hline
+    $0.2866 $ & $0.0011$ & $-0.5823$ & $0.0088$ \\ \hline
+    $0.3719 $ & $0.0011$ & $-0.7420$ & $0.0093$ \\ \hline
+    $0.4583 $ & $0.0012$ & $-0.8262$ & $0.0099$ \\ \hline
+    $0.5458 $ & $0.0012$ & $-0.898$ & $0.010$ \\ \hline
+    $0.6344 $ & $0.0011$ & $-0.903$ & $0.010$ \\ \hline
+    $0.72407 $ & $0.00098$ & $-0.8924$ & $0.0099$ \\ \hline
+    $0.81488 $ & $0.00076$ & $-0.7623$ & $0.0084$ \\ \hline
+    $0.90685 $ & $0.00047$ & $-0.3483$ & $0.0057$ \\ \hline
+    $1.00000 $ & $0.00020$ & $0.0596$ & $0.0031$ \\ \hline
+    \end{tabular}
+    \caption{Volumes molares de exceso para distintas concentracións}
+    \label{cad:volumes_molares_exceso_concentracions}
+  \end{table}
+
+  \begin{figure}[H]
+    \hspace{-14pt}
+    \resizebox{!}{8.5cm}{
+    \input{ve.pgf}}
+    \caption{Volume molar de exceso frente a fracción molar real}
+    \label{fig:ve}
+  \end{figure}
+
+  Podemos oberservar que os datos representan unha parábola cun axuste bastante fiel. Tamén vemos que todos os volumes son negativos menos o correspondente a $\chi_{H_2O}^{real} = 1$, que xa vimos que por definición ha de ser $0$ (neste caso un valor moi próximo).
+  
+  O resto dos valores son todos negativos. Unha posible explicación é que ó mezclar os compostos, fórmanse pontes de hidróxeno e as interaccións entre os mesmos son máis intensas, polo que o volume disminúe un pouco.
+
+
+  \subsection{Volume molar aparente}
+  \label{sec:v_aparente}
+
+  Para calcular o volume molar aparente un dos compostos debe atuar como soluto. Como non sabemos cal dos dous o fai, calcularemos ambos casos. A fórmula (\ref{ec:volume_molar_aparente}) queda así:
+
+  \begin{itemize}
+    \setlength\itemsep{-4pt}
+    \item Auga como soluto:
+          \begin{equation*}
+            v_\phi = \frac{M_{H_2O}}{\rho} + \frac{m_{OH} M_{H_2O}}{m_{H_2O}} \left( \frac{1}{\rho} - \frac{1}{\rho_{OH}} \right)
+          \end{equation*}
+    \item Etanol como soluto:
+          \begin{equation*}
+            v_\phi = \frac{M_{OH}}{\rho} + \frac{m_{H_2O}M_{OH}}{m_{OH}} \left( \frac{1}{\rho} - \frac{1}{\rho_{H_2O}} \right)
+          \end{equation*}
+  \end{itemize}
+
+  Utilizamos a ecuación (\ref{ec:masa_h2o_corrixida}) para calcular as masas corrixidas e obtemos os seguintes datos:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    $\chi_{H_2O}^{real}$ & $v_\phi^{H_2O sol.} (cm^3/mol)$ & $v_\phi^{OH sol.} (cm^3/mol)$ \\ \hline
+    $0.1190 $  & $ - $  &  $ 57.5850 \pm 0.0097 $ \\ \hline
+    $0.2023 $  & $ 8.22 \pm 0.22 $  &  $ 57.300 \pm 0.010 $ \\ \hline
+    $0.2866 $  & $ 12.392 \pm 0.094 $  &  $ 56.982 \pm 0.012 $ \\ \hline
+    $0.3719 $  & $ 13.909 \pm 0.064 $  &  $ 56.628 \pm 0.014 $ \\ \hline
+    $0.4583 $  & $ 14.874 \pm 0.049 $  &  $ 56.293 \pm 0.018 $ \\ \hline
+    $0.5458 $  & $ 15.484 \pm 0.040 $  &  $ 55.856 \pm 0.022 $ \\ \hline
+    $0.6344 $  & $ 16.011 \pm 0.032 $  &  $ 55.380 \pm 0.027 $ \\ \hline
+    $0.72407 $ & $ 16.411 \pm 0.025 $  &  $ 54.644 \pm 0.031 $ \\ \hline
+    $0.81488 $ & $ 16.868 \pm 0.017 $  &  $ 53.796 \pm 0.037 $ \\ \hline
+    $0.90685 $ & $ 17.5435 \pm 0.0091 $  &  $ 54.135 \pm 0.052 $ \\ \hline
+    $1.00000 $ & $ 18.0756 \pm 0.0033 $  &  $ - $ \\ \hline
+    \end{tabular}
+    \caption{Volumes molares aparentes para distintas concentracións}
+    \label{cad:volumes_molares_aparentes_concentracions}
+  \end{table}
+
+  \begin{figure}[H]
+    \centering
+    \begin{minipage}[c]{0,49\textwidth}
+      \begin{figure}[H]
+        \hspace{-26pt}
+        \resizebox{1,05\textwidth}{!}{
+        \input{vah2o.pgf}}
+        \caption{Volume molar aparente frente \\ a concentración con auga como soluto}
+        \label{fig:vah2o}
+      \end{figure}
+    \end{minipage}
+    \begin{minipage}[c]{0,49\textwidth}
+      \begin{figure}[H]
+        \hspace{-26pt}
+        \resizebox{1,05\textwidth}{!}{
+        \input{vaoh.pgf}}
+        \caption{Volume molar aparente frente \\ a concentración con etanol como soluto}
+        \label{fig:vaoh}
+      \end{figure}
+    \end{minipage}
+  \end{figure}
+
+  As gráficas son similares, pero invertidas. Vemos que nos extremos cando a concentración da auga e o alcohol tenden a cero respectivamente hai máis turbulencias e os datos non son tan precisos. Isto se debe a que no límite cando a concentración do soluto tende a cero, o volume molar aparente tende a infinito e a incertidumbre dispárase.
+
+  \subsection{Volume molar parcial}
+  \label{sec:v_parcial}
+
+  Recordando a ecuación \ref{ec:volume_molar_parcial}, temos que:
+  \begin{equation*}
+    \bar{v}_{H_2O} = \frac{M_{H_2O}}{\rho} \qquad \bar{v}_{OH} = \frac{M_{OH}}{\rho}
+  \end{equation*}
+
+  Podemos calcular entón o cadro de datos:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    $\chi_{H_2O}^{real}$ & $\bar{v}_{H_2O} (cm^3/mol)$ & $\bar{v}_{OH} (cm^3/mol)$ \\ \hline
+    $0.1190 $  & $ 22.5200 \pm 0.0031 $  &  $ 57.5850 \pm 0.0073 $ \\ \hline
+    $0.2023 $  & $ 22.2255 \pm 0.0030 $  &  $ 56.8320 \pm 0.0071 $ \\ \hline
+    $0.2866 $  & $ 21.9040 \pm 0.0029 $  &  $ 56.0097 \pm 0.0069 $ \\ \hline
+    $0.3719 $  & $ 21.5528 \pm 0.0028 $  &  $ 55.1119 \pm 0.0067 $ \\ \hline
+    $0.4583 $  & $ 21.1878 \pm 0.0028 $  &  $ 54.1785 \pm 0.0065 $ \\ \hline
+    $0.5458 $  & $ 20.7677 \pm 0.0027 $  &  $ 53.1043 \pm 0.0062 $ \\ \hline
+    $0.6344 $  & $ 20.3112 \pm 0.0026 $  &  $ 51.9369 \pm 0.0060 $ \\ \hline
+    $0.72407 $ & $ 19.7696 \pm 0.0024 $  &  $ 50.5520 \pm 0.0057 $ \\ \hline
+    $0.81488 $ & $ 19.1945 \pm 0.0023 $  &  $ 49.0816 \pm 0.0053 $ \\ \hline
+    $0.90685 $ & $ 18.7140 \pm 0.0022 $  &  $ 47.8529 \pm 0.0051 $ \\ \hline
+    $1.00000 $ & $ 18.0756 \pm 0.0021 $  &  $ 46.2205 \pm 0.0047 $ \\ \hline
+    \end{tabular}
+    \caption{Volumes molares parciais para distintas concentracións}
+    \label{cad:volumes_molares_parciais_concentracions}
+  \end{table}
+
+  E finalmente podemos amosar as gráficas que, nesta ocasión, si se acercan máis a unha regresión lineal ($R^2$ con dous noves en ambos casos). Tamén vemos que, para este valor, ambas gráficas teñen a mesma apariencia, pero a do etanol comeza nun valor moito máis alto e ten maior pendente (en valor absoluto).
+
+  \begin{figure}[H]
+    \centering
+    \begin{minipage}[c]{0,49\textwidth}
+      \begin{figure}[H]
+        \hspace{-26pt}
+        \resizebox{1,05\textwidth}{!}{
+        \input{vbarh.pgf}}
+        \caption{Volume molar parcial da auga}
+        \label{fig:vbarh}
+      \end{figure}
+    \end{minipage}
+    \begin{minipage}[c]{0,49\textwidth}
+      \begin{figure}[H]
+        \hspace{-26pt}
+        \resizebox{1,05\textwidth}{!}{
+        \input{vbaro.pgf}}
+        \caption{Volume molar parcial do etanol}
+        \label{fig:vbaro}
+      \end{figure}
+    \end{minipage}
+  \end{figure}
+
+  \newpage
+  \part{Conclusións}
+
+  O obxetivo desta práctica era experimentar cun sistema binario e ver como a súa densidade depende da concentración de ambos compoñentes e da temperatura.
+
+  Na sección \ref{sec:densidades} comprobamos que efectivamente a densidade desdence coa temperatura. Ademáis, este axuste tivo unha precisión bastante boa nas 11 concentracións, de 3 noves. Mirando o gráfico pódese ver claramente a relación.
+
+  Máis adiante tomamos unha isoterma, a de $T = 28,0 ^\circ C$, para analizar como nunha mesma temperatura a densidade do sistema varía dependendo da concentración dos compoñentes. Descubrimos que fai isto de maneira cuadrática, e o axuste a un polinomio de orde 2 foi moi satisfactorio. Agora temos unha fórmula relacionando a densidade ca fracción molar dun dos compoñentes. Ademáis, comprobamos que para as fraccións molares correspondentes á auga e ó etanol $96 \%$ os valores proporcionados eran moi similares ós teóricos, polo que asumimos que o axuste foi satisfactorio.
+
+  Nas seguintes seccións calculamos os tres volumes molares diferentes. Na parte \ref{sec:v_exceso} calculamos o volume molar de exceso, e vimos que tamén tiña forma parabólica. O punto cando $\chi_{H_2O} = 1$ deu moi próximo a 0, algo que é teóricamente correcto por definición, e o resto de puntos foron negativos. O axuste deste polinomio tamén foi satisfactorio, non tan preciso coma os outros por haber un par de puntos que estaban lixeiramente desviados, pero coincidía na forma con bastante correctitud.
+
+  Para o volume molar aparente, sección \ref{sec:v_aparente}, tivemos que considerar dous casos. Ou ben a agua é o soluto, ou o é o etanol. Ambas gráficas deron similares pero invertidas. Neste caso os datos non se adecuaron tanto ó axuste que pretendíamos. Nesta sección cabe destacar que os erros dos datos deron demasiado pequenos. Aínda utilizando dous métodos distintos de propagación de incertidumbres, a man e co paquete de python \texttt{uncertainties}, a incerteza os datos resultou moi pequena. Asumo que existiu algún erro na introducción das fórmulas da incerteza, xa quecando a fracción molar do soluto tendía a cero os datos están moi indeterminados.
+
+  Finalmente calculamos o volume molar parcial da auga e do etanol no apartado \ref{sec:v_parcial}. Neste último caso os datos sí se axustaron á teoría e deron dúas rectas moi similares para ambos casos.
+
+  En xeral, consideraría a práctica bastante exitosa, xa que os resultados obtidos permitíronnos entender as leis físicas que queríamos estudar, e todos os datos tiveron bastante precisión.
+
+  \begin{appendices}
+    %Formato para a tabla de contido, ignorar
+    \addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+    \makeatletter
+    \addtocontents{toc}{%
+    \begingroup
+    \let\protect\l@chapter\protect\l@section
+    \let\protect\l@section\protect\l@subsection
+    }
+
+    \section{Bibliografía}
+
+    %Cita libros con \cite[nombre]
+
+    \bibliography{bibliografia} %Poñer a bibliografía aquí
+    \bibliographystyle{ieeetr} %Cambiar ao estilo apropiado
+
+    \addtocontents{toc}{\endgroup}
+  \end{appendices}
+
+\end{document}
