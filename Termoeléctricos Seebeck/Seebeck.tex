@@ -1,0 +1,638 @@
+\documentclass[12pt, a4paper, titlepage]{article}
+
+%INFORMACIÓN
+\title{\textbf{Fenómenos Termoeléctricos\\\Huge{Efecto Seebeck}}\\\textbf{\large \textit{Laboratorio de termodinámica (TS)}}}
+\author{{\Large José Pazos Pérez}\\Grupo T2a}
+\date{}
+
+%PAQUETES
+%---
+%Idioma
+\usepackage[spanish,es-tabla,galician]{babel} %Convencións idiomáticas
+\selectlanguage{galician} %Elexir un idioma no ca so de varios
+%---
+%Cores
+\usepackage[dvipsnames]{xcolor} %Colorear texto e cores básicas
+\usepackage{colortbl} %Colorear celdas de tablas
+%Definir cores personalizadas
+\definecolor{Azul}{RGB}{110, 176, 230}
+\definecolor{Vermello}{RGB}{222, 94, 80}
+\definecolor{Link}{RGB}{20, 88, 224}
+%---
+%Estrutura
+\usepackage[margin=2.5cm]{geometry} %Márxenes
+\usepackage[skip=12pt]{parskip} %Espacio tras os parágrafos
+\linespread{1.3} %Interlineado
+\usepackage{float} %Controlar o posicionamento dos obxetos con [H]
+\usepackage[toc,page]{appendix} %Apéndices
+\renewcommand{\appendixpagename}{Apéndices} %Cambiar o nome
+\renewcommand{\appendixtocname}{\large Apéndices}
+\renewcommand{\appendixname}{Apéndices}
+\usepackage{chngcntr} %Resetear o contador de Secciones cada Parte
+\counterwithin*{section}{part}
+%---
+%Funcións
+\usepackage[centertags]{amsmath} %Funcións matemáticas esenciais
+\usepackage{hyperref} %Crear hipervínculos
+\hypersetup{
+    colorlinks=true,
+    linkcolor=Link,
+    filecolor=Vermello,
+    urlcolor=Azul,
+}
+%\usepackage[siunitx]{circuitikz} %Debuxar circuitos por código, fai que a compilación sexa máis lenta
+%---
+%Sintaxis
+%\usepackage{minted} %Sintáxis para código de Python
+%IMPORTANTE: Necesitas una versión actual de Python y el paquete Pygments.
+%Instálalo utilizando pip, ya sea con pip3 install pygments, python3 -m pip install pygments, python -m pip install pygments o la versión correspondiente a tu sistema
+%Tamén tes que cambiar a configuración de latexmk para utilizar a opción "-shell-escape".
+%Ver toda a información en http://tug.ctan.org/macros/latex/contrib/minted/minted.pdf
+%---
+%Soporte de arquivos
+\usepackage{graphicx} %Imáxes
+%\usepackage{csvsimple} %Tablas .csv
+\usepackage{pgfplots} %Gráficas vectoriais dende matplotlib .pgf
+%\pgfplotsset{compat=1.16}
+%---
+%Correccións extra
+%Conflicto entre pgfplots e mathbb
+\protected\edef\mathbb{%
+  \unexpanded\expandafter\expandafter\expandafter{%
+    \csname mathbb \endcsname
+  }%
+}
+%Quitar o título "Referencias" da bibliografía
+\usepackage{etoolbox}
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
+%---
+
+\begin{document}
+  \maketitle
+
+  \tableofcontents
+
+
+  \newpage
+  \part{Introducción}
+
+  \section{Obxetivos}
+
+  Nesta práctica faremos varios experimentos cun dispositivo termoeléctrico e obteremos:
+
+  \begin{itemize}
+    \item O coeficiente de Seebeck($S$)
+    \item A resistencia interna ($r_i$)
+    \item A capacidade calorífica ($C$)
+    \item A condutividade térmica ($\lambda_T$)
+  \end{itemize}
+
+  O obxetivo, ademáis de determinar estas cantidades, é a familiarización co uso e funcionamento dun dispositivo termoeléctrico. Ademáis, traballaremos a análise de datos e a regresión a curvas expoñenciais.
+
+
+  \section{Material}
+
+  \begin{itemize}
+    \item \textbf{Dispositivo termoeléctrico} con 142 pares de conductores A e B
+    \item \textbf{Unión fría:} conectada ó grifo
+    \item \textbf{Unión quente:} contectada á resistencia calefactora
+    \item Fonte de corrente alterna
+    \item Potenciómetro (como resistencia variable)
+    \item Termómetro dixital conectado ás unións fría e quente
+    \item Multímetros en configuración voltímetro e amperímetro
+  \end{itemize}
+
+
+  \newpage
+  \section{O problema de estudo}
+
+  O efecto Seebeck prodúcese cando conectamos dous materiais, A e B, a dúas unións, fría e quente, que teñen unha diferencia de temperatura $\Delta T$.
+  Esta diferencia provoca que apareza unha corrente entre ambos, cuxa forza electromotríz $\varepsilon$ ven dada por:
+  \begin{equation}
+    \varepsilon = S \cdot \Delta T
+    \label{ec:potencial_bornes}
+  \end{equation}
+
+  $S$ é o coeficiente de Seebeck que buscamos determinar. Para iso quentaremos a unión quente mediante a resistencia, que proporcionará unha potencia $W_R$.
+  Chamaremos $T_2$ á unión quente e $T_1$ á fría. Ademáis, tendo en conta a capacidade calorífica $C$ e a condutividade térmica $\lambda_T$, podemos escribir e ecuación de balance enerxético:
+  \begin{equation}
+    C \frac{d T_2}{t} = W_R - \lambda_T (T_2 - T_1)
+    \label{ec:balance_enerxetico_tempo}
+  \end{equation}
+
+  A temperatura da unión quente $T_2$ crece exponencialmente ata que chega ó \textbf{estado estacionario}, no que acada o valor máximo $T_2^\infty$. Neste estado no que a temperatura non varía cúmprese:
+  \begin{equation}
+    W_R = \lambda_T (T_2^\infty - T_1)
+    \label{ec:w_r_lambda_t}
+  \end{equation}
+
+  Tamén podemos ver como evoluciona a temperatura $T_2$ có tempo:
+  \begin{equation}
+    T_2(t) = T_2^\infty - (T_2^\infty - T_2(0)) \cdot e^{-\frac{\lambda_T}{C}t}
+    \label{ec:t2_tempo}
+  \end{equation}
+
+
+
+
+  \newpage
+  \part{Procedemento experimental}
+
+  \section{Caracterización da resistencia}
+
+  Antes de estudar o sistema termoeléctrico debemos de coñecer o valor da resitencia calefactora, $R_C$.
+  Para iso podemos utilizar a ley de Ohm:
+  \begin{equation}
+    V = IR
+    \label{ec:ley_ohm}
+  \end{equation}
+
+  \subsection{Medidas}
+
+  Tomaremos pares de datos $V, I$ para facer unha regresión lineal e obter o valor da resistencia.
+  Para iso, colocamos o voltímetro en paralelo á fonte de corriente alterna e o amperímetro en serie coa fonte e a resistencia.
+  Facemos varias medidas e obtemos a seguinte táboa:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    $V(V) \pm 0,1 V$ & $I(mA) \pm 0,1 mA$ \\ \hline
+    10,43            & 12,3               \\ \hline
+    20,0             & 24,1               \\ \hline
+    40,5             & 49,7               \\ \hline
+    59,7             & 73,5               \\ \hline
+    80,2             & 98,5               \\ \hline
+    100,4            & 123,3              \\ \hline
+    120,5            & 147,7              \\ \hline
+    139,9            & 170,8              \\ \hline
+    160,7            & 195,7              \\ \hline
+    162,5            & 198,1              \\ \hline
+    \end{tabular}
+    \caption{Medidas de tensión ($V$) e intensidade ($I$)}
+  \end{table}
+
+  \subsection{Regresión lineal}
+
+  Tendo o cadro cos datos podemos facer unha regresión lineal simple por mínimos cadrados sen término independiente (explicación nos apuntes de técnicas experimentais de Alfredo Amigo).
+  Obtemos a seguinte gráfica e o valor para $R_C$:
+  \begin{equation}
+    R_C = 818,5 \pm 1,0 \Omega
+    \label{ec:resistencia}
+  \end{equation}
+
+  É un axuste de 5 noves, con $R^2 = 0,999993$, polo que diremos que é moi preciso.
+
+  \begin{figure}[H]
+    %\centering
+    \hspace{12pt}
+    \input{vir.pgf}
+    \caption{Tensión frente a Intensidade con regresión lineal}
+  \end{figure}
+
+
+
+
+  \section{Evolución ó estado estacionario}
+
+  Agora procederemos a quentar o circuito quente coa resistencia calefactora e ver como evoluciona a temperatura do sistema.
+  Primeiro desconectamos o amperímetro e mantemos o voltímetro. Miramos que o grifo da unión fría esté funcionando e acendemos o termómetro e a fonte de corrente alterna.
+  Veremos como o valor de $T_2$ comezará a subir no termómetro.
+
+  \subsection{Medidas}
+
+  Elaboraremos un cadro no que anotaremos $T_1$ e $T_2$ cada minuto ata que $T_2$ non suba máis de $0,1 ^{\circ} C$ cada 2 minutos.
+  Presentamos as táboas para $125,2V$ e $150,5V$.
+
+  As incertidumbres das medidas serán de $0,1 ^{\circ} C$ para as temperaturas, e de apróximadamente $3 s$ para o tempo, para ter en conta calquer error pola nosa parte ao anotar os datos xusto cando pasa $1 min$.
+
+  \begin{table}[H] 
+    \centering
+    \begin{minipage}[c]{0,4\textwidth}
+      \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t(min)$  & $T_1 (^{\circ} C)$ & $T_2 (^{\circ} C)$ \\ \hline
+        1  & 19,4  & 25,3  \\ \hline
+        2  & 19,5  & 25,9  \\ \hline
+        3  & 19,4  & 26,4  \\ \hline
+        4  & 19,4  & 27,0  \\ \hline
+        5  & 19,4  & 27,5  \\ \hline
+        6  & 19,5  & 28,1  \\ \hline
+        7  & 19,6  & 28,6  \\ \hline
+        8  & 18,2  & 29,0  \\ \hline
+        9  & 18,2  & 29,4  \\ \hline
+        10 & 18,3  & 29,9  \\ \hline
+        11 & 18,4  & 30,4  \\ \hline
+        12 & 18,4  & 30,8  \\ \hline
+        13 & 18,5  & 31,2  \\ \hline
+        14 & 18,8  & 31,6  \\ \hline
+        15 & 18,7  & 31,9  \\ \hline
+        16 & 18,6  & 32,2  \\ \hline
+        17 & 18,7  & 32,6  \\ \hline
+        18 & 18,8  & 32,9  \\ \hline
+        19 & 18,9  & 33,2  \\ \hline
+        20 & 19,0  & 33,5  \\ \hline
+        21 & 19,2  & 33,7  \\ \hline
+        22 & 19,1  & 33,9  \\ \hline
+        23 & 19,0  & 34,2  \\ \hline
+        24 & 19,1  & 34,4  \\ \hline
+        25 & 19,1  & 34,7  \\ \hline
+        26 & 19,4  & 34,9  \\ \hline
+        27 & 19,5  & 35,1  \\ \hline
+        28 & 19,3  & 35,3  \\ \hline
+        29 & 19,5  & 35,6  \\ \hline
+        30 & 19,4  & 35,8  \\ \hline
+        31 & 19,3  & 35,9  \\ \hline
+        32 & 19,6  & 36,1  \\ \hline
+        33 & 19,9  & 36,3  \\ \hline
+        34 & 20,0  & 36,4  \\ \hline
+        \end{tabular}
+      \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,4\textwidth}
+      \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t(min)$  & $T_1 (^{\circ} C)$ & $T_2 (^{\circ} C)$ \\ \hline
+        35 & 20,1  & 36,7  \\ \hline
+        36 & 20,4  & 36,8  \\ \hline
+        37 & 20,1  & 36,9  \\ \hline
+        38 & 20,0  & 37,1  \\ \hline
+        39 & 19,9  & 37,3  \\ \hline
+        40 & 20,1  & 37,4  \\ \hline
+        41 & 20,3  & 37,5  \\ \hline
+        42 & 20,4  & 37,7  \\ \hline
+        43 & 20,3  & 37,9  \\ \hline
+        44 & 20,5  & 38,0  \\ \hline
+        45 & 20,4  & 38,1  \\ \hline
+        46 & 20,5  & 38,2  \\ \hline
+        47 & 20,5  & 38,3  \\ \hline
+        48 & 20,4  & 38,4  \\ \hline
+        49 & 20,5  & 38,5  \\ \hline
+        50 & 20,5  & 38,6  \\ \hline
+        51 & 20,6  & 38,8  \\ \hline
+        52 & 20,5  & 38,9  \\ \hline
+        53 & 20,7  & 38,9  \\ \hline
+        54 & 20,7  & 39,0  \\ \hline
+        55 & 20,6  & 39,1  \\ \hline
+        56 & 20,5  & 39,2  \\ \hline
+        57 & 20,7  & 39,3  \\ \hline
+        58 & 20,6  & 39,4  \\ \hline
+        59 & 20,6  & 39,4  \\ \hline
+        60 & 20,7  & 39,5  \\ \hline
+        61 & 20,7  & 39,6  \\ \hline
+        62 & 20,9  & 39,7  \\ \hline
+        63 & 17,3  & 39,5  \\ \hline
+        64 & 17,3  & 39,5  \\ \hline
+        65 & 17,3  & 39,6  \\ \hline
+        66 & 17,3  & 39,6  \\ \hline
+        67 & 17,3  & 39,7  \\ \hline
+        68 & 17,3  & 39,7  \\ \hline
+        \end{tabular}
+      \end{table}
+    \end{minipage}
+    \caption{Medidas de $T_1$ e $T_2$ respecto ó tempo para $V_1 = 125,2V$}
+  \end{table}
+
+
+  \begin{table}[H] 
+    \centering
+    \begin{minipage}[c]{0,4\textwidth}
+      \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t(min)$  & $T_1 (^{\circ} C)$ & $T_2 (^{\circ} C)$ \\ \hline
+        1  & 17,7 & 42,0 \\ \hline
+        2  & 17,6 & 42,3 \\ \hline
+        3  & 17,7 & 42,6 \\ \hline
+        4  & 17,7 & 42,9 \\ \hline
+        5  & 17,7 & 43,3 \\ \hline
+        6  & 17,6 & 43,6 \\ \hline
+        7  & 17,7 & 43,9 \\ \hline
+        8  & 17,7 & 44,3 \\ \hline
+        9  & 17,8 & 44,5 \\ \hline
+        10 & 17,8 & 44,8 \\ \hline
+        11 & 17,8 & 45,0 \\ \hline
+        12 & 17,7 & 45,2 \\ \hline
+        13 & 17,7 & 45,5 \\ \hline
+        14 & 17,7 & 45,7 \\ \hline
+        15 & 17,8 & 45,8 \\ \hline
+        16 & 17,8 & 46,1 \\ \hline
+        17 & 17,9 & 46,3 \\ \hline
+        18 & 17,8 & 46,4 \\ \hline
+        19 & 17,9 & 46,6 \\ \hline
+        20 & 17,9 & 46,8 \\ \hline
+        21 & 17,9 & 47,0 \\ \hline
+        22 & 17,9 & 47,1 \\ \hline
+        \end{tabular}
+      \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,4\textwidth}
+      \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|c|}
+        \hline
+        $t(min)$  & $T_1 (^{\circ} C)$ & $T_2 (^{\circ} C)$ \\ \hline
+        23 & 17,9 & 47,3 \\ \hline
+        24 & 18,0 & 47,4 \\ \hline
+        25 & 17,9 & 47,6 \\ \hline
+        26 & 17,9 & 47,7 \\ \hline
+        27 & 18,0 & 47,8 \\ \hline
+        28 & 17,9 & 48,0 \\ \hline
+        29 & 17,9 & 48,1 \\ \hline
+        30 & 17,9 & 48,2 \\ \hline
+        31 & 18,0 & 48,3 \\ \hline
+        32 & 17,9 & 48,4 \\ \hline
+        33 & 18,0 & 48,5 \\ \hline
+        34 & 17,9 & 48,6 \\ \hline
+        35 & 17,9 & 48,7 \\ \hline
+        36 & 17,9 & 48,8 \\ \hline
+        37 & 18,0 & 48,9 \\ \hline
+        38 & 18,0 & 48,9 \\ \hline
+        39 & 18,1 & 49,0 \\ \hline
+        40 & 18,1 & 49,1 \\ \hline
+        41 & 18,1 & 49,2 \\ \hline
+        42 & 18,1 & 49,3 \\ \hline
+        43 & 18,1 & 49,3 \\ \hline
+        44 & 18,1 & 49,3 \\ \hline
+        \end{tabular}
+      \end{table}
+    \end{minipage}
+    \caption{Medidas de $T_1$ e $T_2$ respecto ó tempo para $V_2 = 150,5V$}
+  \end{table}
+  
+  Podemos debuxar as gráficas correspondentes a estes valores con \texttt{matplotlib}. Sen embargo, na primeira (\ref{fig:v125a}) veremos algo curioso.
+  O circuito quente sube exponencialmente ata acadar unha temperatura máxima na que se estabiliza.
+  O circuito frío tamén tende a subir, pero hai dous saltos preocupantes arredor de $t = 8 min$ e $t = 63 min$.
+
+  Tras comunicarlle o comportamento extraño do circuito ó profesor encargado este recolocou as sondas do termómetro e as medicións subsequentes non presentaron este problema (ó facer iso, o circuito termoeléctrico enfriouse un pouco, por eso podemos ver un salto en $T_2$ cara ó final).
+  Deducimos pois que foi un mal contacto da sonda colocada no circuito frío $T_1$, e descartaremos a súa contribucón na primeira gráfica. A sonda de $T_2$ parece que funcionou correctamente á vista dos resultados.
+
+  \begin{figure}[H]
+    %\centering
+    \hspace{12pt}
+    \input{v125a.pgf}
+    \caption{Temperaturas do circuito frío $T_1$ e do quente $T_2$ fronte o tempo para $V = 125,2V$}
+    \label{fig:v125a}
+  \end{figure}
+
+  \begin{figure}[H]
+    %\centering
+    \hspace{12pt}
+    \input{v150a.pgf}
+    \caption{Temperaturas do circuito frío $T_1$ e do quente $T_2$ fronte o tempo para $V = 150,5V$}
+    \label{fig:v150a}
+  \end{figure}
+
+  Tamén podemos observar que na segunda medición, con $V = 150,5V$, tivemos que tomar menos valores ata chegar ó estado estacionario. Esto se debe a que o circuito xa estaba quente da expericiencia anterior.
+ 
+  Nesta segunda gráfica (\ref{fig:v150a}) vemos que $T_1$ non ten ningún salto raro. Ademáis, vemos que crece moi pouquiño, pero aumenta algo de valor, non é constante. Esto se debe á transmisión de calor que se produce dende o circuito quente ó frío.
+
+  \subsection{Regresión non lineal}
+
+  Faremos unha regresión non lineal de $T_2$ a unha curva do estilo:
+  \begin{equation}
+    y = a + b \cdot e^{cx}
+  \end{equation}
+
+  Se a comparamos con (\ref{ec:t2_tempo}) podemos identificar:
+  \begin{gather*}
+    y = T_2(t) \qquad x = t \\
+    a = T_2^\infty \qquad b = -(T_2^\infty - T_2(0)) \qquad c = -\frac{\lambda_T}{C}
+  \end{gather*}
+
+  Debuxamos as gráficas cos seus parámetros de axuste\footnote{Representaremos as gráficas en graos celsius por ser máis intuitivas pero realizaremos todos os cálculos en Kelvin.}:
+
+  \begin{figure}[H]
+    %\centering
+    \hspace{12pt}
+    \input{v125ar.pgf}
+    \caption{Temperaturas do circuito quente $T_2$ con regresión non lineal para $V = 125,2V$}
+    \label{fig:v125ar}
+  \end{figure}
+
+  \begin{figure}[H]
+    %\centering
+    \hspace{12pt}
+    \input{v150ar.pgf}
+    \caption{Temperaturas do circuito quente $T_2$ con regresión non lineal para $V = 150,5V$}
+    \label{fig:v150ar}
+  \end{figure}
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{c|c|c|c|}
+    \cline{2-4}
+                                                & $\mathbf{a(K)}$               & $\mathbf{b(K)}$               & $\mathbf{c(s^{-1})}$   \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{V = 125,2V}$} & $314,094 \pm 0.051$              & $-16,330 \pm 0.045$             & $(-6.271 \pm 0.057) \cdot 10^{-4}$ \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{V = 150,5V}$} & $323,846 \pm 0,054$ & $-9,284 \pm 0,044$ & $(-6.954 \pm 0,093) \cdot 10^{-4}$ \\ \hline
+    \end{tabular}
+    \caption{Valores do axuste non lineal}
+    \label{cadro:4}
+  \end{table}
+
+  Vemos que ambos valores de $a = T_2^\infty$ son algo maiores que os acadados nos experimentos, ainda que non moito, polo que non quedaba demasiado para acadar o estado estacionario.
+
+  \subsection{Cálculo de $\lambda_T$ e $C$}
+
+  A partir destes datos podemos calcular $\lambda_T$ e $C$. Despexamos $\lambda_T$ de (\ref{ec:w_r_lambda_t}) e temos:
+  \begin{gather}
+    \lambda_T = \frac{W_R}{T_2^\infty - T_1} = \frac{V^2}{R_C (T_2^\infty - T_1)} \\
+    s(\lambda_T) = \lambda_T \sqrt{\left( \frac{2s(V)}{V} \right)^2 + \left( \frac{s(R_C)}{R_C} \right)^2 + \left( \frac{s(T_2^\infty)}{T_2^\infty - T_1} \right)^2 + \left( \frac{s(T_1)}{T_2^\infty - T_1} \right)^2}
+  \end{gather}
+
+  Na ecuación anterior aparece $T_1$, que asumiremos constante ó longo do experimento. Sen embargo, como o seu valor variou tanto no primeiro experimento, e non era estríctamente constante no segundo, tomaremos as súas medias con tratamento de incertidumbres.
+  Para $V = 125,2V$ tomaremos a incertidumbre de $T_1$ como $\pm 2K$, xa que é o rango que cubre o salto maior. Podemos intuír que este resultado non terá un índice de confianza alto. No segundo caso, con $V = 150,5V$, $s(T_1) = \pm 0,1K$.
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+      \hline
+      $\mathit{V = 125,2V}$ & $\bar{T_1} = 292.7 \pm 2.0 K$ \\ \hline
+      $\mathit{V = 150,5V}$ & $\bar{T_1} = 290.8 \pm 0.10 K$ \\ \hline
+    \end{tabular}
+    \caption{Valores medios de $T_1$}
+    \label{cadro:5}
+  \end{table}
+
+  Sustituíndo podemos calcular a condutividade, e unha vez a teñamos tamén podemos despexar a capacidade calorífica có parámetro $c$ da regresión anterior:
+  \begin{equation}
+    C = - \frac{\lambda_T}{c} \qquad s(C) = \left\vert \frac{1}{c} \right\vert \sqrt{s(\lambda_T)^2 + (C \cdot s(c))^2}
+  \end{equation}
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+      \hline
+      $\mathit{V = 125,2V}$ & $\lambda_T = 0.895 \pm 0.084 \ W/K$ & $C = 1430 \pm 130 J/K$ \\ \hline
+      $\mathit{V = 150,5V}$ & $\lambda_T = 0.8392 \pm 0.0033 \ W/K$ & $C = 1207 \pm 17 J/K$ \\ \hline
+    \end{tabular}
+    \caption{Condutividade e capacidade caloífica do termoeléctrico}
+  \end{table}
+
+
+
+  \section{Medida da forza electromotríz}
+
+  Agora, mantendo o voltaxe do xerador para permanecer no estado estacionario, retiramos o voltímetro do circuito RC.
+  Mediremos a $\varepsilon$ xerada polo efecto Seebeck en dúas configuracións.
+
+  \subsection{Modo aberto}
+
+  Conectamos o voltímetro directamente ós bornes do módulo termoeléctrico, en configuración DC. Obtemos os seguintes valores:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+      \hline
+      $\mathit{V = 125,2V}$ & $\varepsilon = 1,172 \pm 0,001V$ \\ \hline
+      $\mathit{V = 150,5V}$ & $\varepsilon = 1,661 \pm 0,001V$ \\ \hline
+    \end{tabular}
+    \caption{Forza electromotríz $\varepsilon$ en modo aberto, medindo en bornes}
+  \end{table}
+
+  \subsection{Modo pechado}
+
+  Cerramos o dispositivo termoeléctrico conectando ambos bornes en serie cun potenciómetro (resistencia variable).
+  A caída de potencial do circuito é debida tanto á resistencia interna $r_i$ como á do potenciómetro $R_P$.
+  \begin{equation}
+    \varepsilon = \Delta V_{r_i} + \Delta V_{R_P} \quad \rightarrow \quad \Delta V_{R_P} = \varepsilon - r_i I
+  \end{equation}
+
+  \subsubsection{Medidas}
+
+  Conectando o voltímetro en paralelo nos bornes do potenciómetro e o amperímetro en serie, mediremos pares $\Delta V_{R_P}, I$ cos que poderemos facer un axuste lineal con término independente e obter $\varepsilon$ e $r_i$.
+  A continuación detallamos os cadros cas medidas:
+
+  \begin{figure}[H] 
+    \centering
+    \begin{minipage}[c]{0,45\textwidth}
+      \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|}
+        \hline
+        $V_{R_P} (V) \pm 0,001 V$    & $I (mA) \pm 0,1 mA$  \\ \hline
+        0,245 & 194,9 \\ \hline
+        0,320  & 175,1 \\ \hline
+        0,356  & 168,4 \\ \hline
+        0,399  & 159,0 \\ \hline
+        0,441  & 149,6 \\ \hline
+        0,495  & 137,6 \\ \hline
+        0,569  & 121,8 \\ \hline
+        0,605  & 114,5 \\ \hline
+        0,643  & 106,5 \\ \hline
+        0,695  & 95,7  \\ \hline
+        \end{tabular}
+        \caption{$\Delta V_{R_P}, I$ para $V = 125,2V$}
+      \end{table}
+    \end{minipage}
+    \begin{minipage}[c]{0,45\textwidth}
+      \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|}
+        \hline
+        $V_{R_P} (V) \pm 0,001 V$    & $I (mA) \pm 0,1 mA$  \\ \hline
+        0,728 & 192,6 \\ \hline
+        0,800 & 176,7 \\ \hline
+        0,899 & 155,5 \\ \hline
+        0,935 & 148,1 \\ \hline
+        0,998 & 134,5 \\ \hline
+        1,033 & 126,9 \\ \hline
+        1,096 & 113,8 \\ \hline
+        1,126 & 107,6 \\ \hline
+        1,184 & 95,4  \\ \hline
+        1,221 & 87,8  \\ \hline
+        \end{tabular}
+        \caption{$\Delta V_{R_P}, I$ para $V = 150,5V$}
+      \end{table}
+    \end{minipage}
+  \end{figure}
+
+  \subsubsection{Regresión lineal}
+
+  \begin{figure}[H]
+    %\centering
+    \hspace{12pt}
+    \input{vb.pgf}
+    \caption{$\Delta V_{R_P}$ fronte a $I$ con regresión lineal}
+    \label{fig:vb}
+  \end{figure}
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{c|c|c|c|}
+    \cline{2-4}
+                                                & $\mathbf{r_i}$               & $\mathbf{\varepsilon}$     & $R^2$           \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{V = 125,2V}$} & $ 4.59116 \pm 1,1 \cdot 10^{-4} \Omega$ & $1.130128 \pm 1.6 \cdot 10^{-5} V$ & $0.9995$ \\ \hline
+    \multicolumn{1}{|c|}{$\mathbf{V = 150,5V}$} & $ 4.709041 \pm 1.1 \cdot 10^{-5} \Omega$ & $1.6324936 \pm 1,5 \cdot 10^{-6} V$ & $0.99996$  \\ \hline
+    \end{tabular}
+    \caption{Valores do axuste lineal}
+    \label{cadro:10}
+  \end{table}
+
+  Vendo os datos, ambos axustes son bastante precisos, un de 3 e outro de 4 noves. Procedamos agora a calcular os coeficientes de Seebeck, obxetivo final da práctica.
+  
+
+  \section{Coeficientes de Seebeck}
+
+  Despexamos o coeficiente de Seebeck da ecuación (\ref{ec:potencial_bornes}) e sustituímos $\Delta T$ por $T_2^\infty - \bar{T_1}$ (xa que a forza electromotríz foi calculada no estado estacionario).
+  Utilizando os datos obtidos nos cadros \ref{cadro:4}, \ref{cadro:5} e \ref{cadro:10} podemos calcular:
+  \begin{equation}
+    S = \frac{\varepsilon}{T_2^\infty - \bar{T_1}} \qquad s(S) = S\sqrt{\left( \frac{s(\varepsilon)}{\varepsilon} \right)^2 + \left( \frac{s(T_2^\infty)}{T_2^\infty - \bar{T_1}} \right)^2 + \left( \frac{s(\bar{T_1})}{T_2^\infty - \bar{T_1}} \right)^2}
+  \end{equation}
+
+  Necesitamos un único valor de $\varepsilon$, así que tomamos a media entre o modo aberto e pechado, e obtemos:
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+      \hline
+      $\mathit{V = 125,2V}$ & $\varepsilon = 1.15106 \pm 0.00050 V$ \\ \hline
+      $\mathit{V = 150,5V}$ & $\varepsilon = 1.64675 \pm 0.00050 V$ \\ \hline
+    \end{tabular}
+    \caption{Valores medios da forza electromotríz $\varepsilon$}
+  \end{table}
+
+  E finalmente temos os coeficientes de Seebeck:
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+      \hline
+      $\mathit{V = 125,2V}$ & $S = 0.0538 \pm 0.0050 V/K$ \\ \hline
+      $\mathit{V = 150,5V}$ & $S = 0.04994 \pm 0.00017 V/K$ \\ \hline
+    \end{tabular}
+    \caption{Coeficiente de Seebeck $S$ do dispositivo termoeléctrico}
+  \end{table}
+
+
+  \newpage
+  \part{Conclusións}
+
+  Nesta práctica estudamos un dispositivo termoeléctrico que, ó ser sometido a unha diferencia de temperatura, produce unha corrente polo efecto Seebeck.
+  Calculamos varios parámetros que describen este fenómeno:
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+      \hline
+      $\mathit{V = 125,2V}$ & $\mathit{V = 150,5V}$ \\ \hline
+      $S = 0.0538 \pm 0.0050 \ V/K$ & $S = 0.04994 \pm 0.00017 \ V/K$ \\ \hline
+      $r_i = 4.59116 \pm 1,1 \cdot 10^{-4} \ \Omega$ & $r_i = 4.709041 \pm 1.1 \cdot 10^{-5} \ \Omega$\\ \hline
+      $C = 1430 \pm 130 \ J/K$ & $C = 1207 \pm 17 \ J/K$ \\ \hline
+      $\lambda_T = 0.895 \pm 0.084 \ W/K$ & $\lambda_T = 0.8392 \pm 0.0033 \ W/K$ \\ \hline
+    \end{tabular}
+    \caption{Medicións obxetivo da práctica}
+  \end{table}
+
+  Antes de pasar ó análise dos datos, podemos facer varias críticas á xestión da práctica.
+  En primeiro lugar, a práctica ten unha clara fonte de error, que é a anomalía presentada polo termómetro. Un salto de máis de $3 ^{\circ} C$ sobrepasa todos os límites razoables de error, e o idóneo sería repetir a práctica dende o principio. Isto non era factible xa que habería que esperar a que o dispositivo se enfríase e xa levábamos unha hora de práctica, polo que a instrucción foi seguir con eses datos.
+
+  O guión indica co coeficiente de Seebeck $S$ ten un valor aproximado de $0,059 V/K$. Os nosos valores foron entre $0,054$ e $0,050$, non tan preto como sería desexable. Tamén vemos que entre eles hai unha difernencia considerable, e que as incertidumbres obtidas por tratamento de erroes foron ridículamente baixas, polo que está claro que nalgunha parte do proceso deberíamos de introducir unha horquilla de erro máis amplia.
+
+  A diferencia entre os valores obtidos e o teórico pode deberse a varios factores. Primeiramente, ós problemas ocasionados polo termómetro. Pode que o aumento da temperatura do foco frío, que non permanece constante, e que tomáramos a media e non o valor máis alto tamén influa, así como quizáis non atopar con precisión o valor estacionario. Por último, tamén sería posible que o dispositivo non tivera o valor tabulado do coeficiente de Seebeck. 
+
+  Para o resto de valores non temos unha referencia sobre cánto teñen que medir. Estes serán de utilidade na próxima práctica, a do efecto Peltier.
+
+\end{document}
